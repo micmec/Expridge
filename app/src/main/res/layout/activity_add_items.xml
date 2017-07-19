@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="it.centotrenta.expridge.AddItems">
 
-    <TextView
+
+    <EditText
+        android:id="@+id/name_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ADD ITEMS"/>
+        android:layout_weight="5"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name"
+        android:layout_marginTop="16dp" />
 
-</android.support.constraint.ConstraintLayout>
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="5" />
+
+    <Button
+        android:id="@+id/addButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="109dp"
+        android:onClick="onClick"
+        android:text="Add Item"/>
+
+</LinearLayout>
