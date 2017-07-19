@@ -8,9 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 
 /**
@@ -138,34 +136,5 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
 
         notifyDataSetChanged();
     }
-
-    public static String toDate(long milliSeconds, String format){
-
-        SimpleDateFormat formatter = new SimpleDateFormat(format);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-
-        return formatter.format(calendar.getTime());
-    }
-
-    public static ArrayList<String> toArrayDate(ArrayList<Long> milliSeconds, String format){
-
-        ArrayList<String> string = new ArrayList<>();
-
-        for(int i = 0; i<milliSeconds.size();i++) {
-
-            SimpleDateFormat formatter = new SimpleDateFormat(format);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(milliSeconds.get(i));
-
-            string.add(formatter.format(calendar.getTime()));
-
-        }
-        return string;
-    }
-
-
 
 }
