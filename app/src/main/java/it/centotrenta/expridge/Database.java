@@ -1,6 +1,7 @@
 package it.centotrenta.expridge;
 
-import java.io.Serializable;
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,11 +12,11 @@ import java.util.Calendar;
  * 130 si volaa! Martin G
  */
 
-public class Database implements Serializable{
+public class Database {
 
-    public ArrayList<String> itemsName;
-    public ArrayList<Long> itemsDate;
-    public ArrayList<Integer> itemsImage;
+    public ArrayList<String> itemsName = new ArrayList<>();
+    public ArrayList<String> itemsDate = new ArrayList<>(); // Todo want to save the LONG value, so we can sort
+    public String TAG = "Db";
 
     public ArrayList<String> getItemsName(){
 
@@ -23,43 +24,31 @@ public class Database implements Serializable{
 
     }
 
-    public ArrayList<Long> getItemsDate(){
+    public ArrayList<String> getItemsDate(){ //
 
         return itemsDate;
 
     }
 
-    public ArrayList<Integer> getItemsImage(){
-
-        return itemsImage;
-
-    }
-
-    public void setItemsName(ArrayList<String> arrayList){
-
-        itemsName = arrayList;
-
-    }
-
-    public void setItemsDate(ArrayList<Long> arrayList){
-
-        itemsDate = arrayList;
-
-    }
-
-    public void setItemsImage(ArrayList<Integer> arrayList){
-
-        itemsImage = arrayList;
-
-    }
-
-
 
     public void addItem(Items item){
 
-        itemsName.add(item.get_itemName());
-        itemsDate.add(item.get_date());
-        itemsImage.add(R.drawable.dairy);
+        if(!itemsName.isEmpty() && !itemsDate.isEmpty()){
+
+            itemsName.add(item.get_itemName());
+            itemsDate.add(item.get_date());
+            Log.d(TAG,"First Choice");
+        }
+        else{
+
+            itemsName = new ArrayList<>();
+            itemsName.add(item.get_itemName());
+            itemsDate = new ArrayList<>();
+            itemsDate.add(item.get_date());
+            Log.d(TAG,"Second Choice");
+
+        }
+
     }
 
     public String toDate(long milliSeconds, String format){
@@ -70,29 +59,6 @@ public class Database implements Serializable{
         calendar.setTimeInMillis(milliSeconds);
 
         return formatter.format(calendar.getTime());
-    }
-
-    public ArrayList<String> getItemsDateFormatted() {
-
-        return toArrayDate(itemsDate, "dd/MM/yyyy");
-    }
-
-
-    public ArrayList<String> toArrayDate(ArrayList<Long> milliSeconds, String format){
-
-        ArrayList<String> string = new ArrayList<>();
-
-        for(int i = 0; i<milliSeconds.size();i++) {
-
-            SimpleDateFormat formatter = new SimpleDateFormat(format);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(milliSeconds.get(i));
-
-            string.add(formatter.format(calendar.getTime()));
-
-        }
-        return string;
     }
 
     public boolean isNil(){
@@ -110,4 +76,5 @@ public class Database implements Serializable{
         itemsDate = new ArrayList<>();
 
     }
+
 }

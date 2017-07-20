@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/food_image"
@@ -19,6 +19,7 @@
         android:layout_height="45dp"
         android:layout_margin="5dp"
         android:layout_weight="2"
+        android:textColor="#FFF"
         android:background="@color/colorPrimary"
         android:elevation="1dp"
         android:fontFamily="sans-serif-smallcaps"
@@ -29,6 +30,7 @@
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_margin="5dp"
+        android:textColor="#000"
         android:layout_weight="4"
         android:elevation="1dp"
         android:fontFamily="sans-serif-smallcaps"

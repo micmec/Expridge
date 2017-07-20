@@ -1,19 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/list_layout"
+    tools:context="it.centotrenta.expridge.MainActivity">
 
-    <Button
-        android:id="@+id/buttonList"
+    <android.support.v7.widget.RecyclerView
+        android:padding="5dp"
+        android:id="@+id/list_activity_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="goToList"
-        android:text="Go to List" />
+        android:layout_height="match_parent"/>
 
-    <Button
-        android:id="@+id/buttonAdd"
-        android:layout_width="match_parent"
+    <ProgressBar
+        android:id="@+id/list_activity_progressBar"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/list_activity_errorMessage"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="goToAdd"
-        android:text="Go to Add" />
-</LinearLayout>
+        android:padding="16dp"
+        android:layout_gravity="center"
+        android:text="@string/error_message"
+        android:textSize="20sp"
+        android:visibility="invisible"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/red_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="10dp"
+        android:onClick="redButtonAction" />
+
+</FrameLayout>

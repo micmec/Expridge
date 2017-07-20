@@ -1,5 +1,8 @@
 package it.centotrenta.expridge;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by michelangelomecozzi on 17/07/2017.
  * <p>
@@ -10,9 +13,6 @@ public class Items {
 
     private String _itemName;
     private long _date;
-
-    public Items() {
-    }
 
     public Items(String _itemName, long _date) {
         this._itemName = _itemName;
@@ -28,15 +28,19 @@ public class Items {
         this._itemName = _itemName;
     }
 
-    public long get_date() {
-        return _date;
+    public String get_date() {
+
+        return toDate(_date, "dd/MM/yyyy");
+
     }
 
     public void set_date(long _date) {
         this._date = _date;
     }
 
-    public int getRelativeImages() {
+
+
+    public int getRelativeImages(String _itemName) {
 
 
         if (
@@ -68,6 +72,22 @@ public class Items {
             return R.mipmap.ic_launcher;
         }
 
+    }
+
+    public boolean isNil(){
+
+        return (this._itemName==null || this._date == 0);
+
+    }
+
+    public String toDate(long milliSeconds, String format){
+
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+
+        return formatter.format(calendar.getTime());
     }
 
 }
