@@ -27,8 +27,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
     private ArrayList<String> itemInformationName;
     private ArrayList<String> itemInformationDate;
     private ArrayList<Integer> itemInformationImage;
-    public String TAG = "Db";
-
+    private String TAG = "ImageResolution";
 
     // Inner interface for the click handling
     public interface ListItemsAdapterClickHandler {
@@ -40,11 +39,8 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
     public ListItemsAdapter(ListItemsAdapterClickHandler clickHandler) {
         listClickHandler = clickHandler;
         itemInformationName = MainActivity.db.getItemsName();
-        itemInformationDate = MainActivity.db.getItemsDate(); //
+        itemInformationDate = MainActivity.db.getItemsDate();
         itemInformationImage = getRelativeImages(MainActivity.db.getItemsName());
-
-        Log.d(TAG,"MainActivity constructed");
-
     }
 
 
@@ -69,8 +65,6 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
 
             // Click handling
             view.setOnClickListener(this);
-
-            Log.d(TAG,"Adapter created");
 
         }
 
@@ -107,8 +101,6 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         // Create the ViewHolder from the previous information
         View view = inflater.inflate(layoutId, parent, shouldAttachToParentImmediately);
 
-        Log.d(TAG,"View holder created");
-
         return new ListAdapterViewHolder(view);
 
 
@@ -117,8 +109,6 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
     // Override the method for the data-binding
     @Override
     public void onBindViewHolder(ListAdapterViewHolder holder, int position) {
-
-        Log.d(TAG,"Binding started");
 
         // Get the information
         String itemName = itemInformationName.get(position);
@@ -131,11 +121,9 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         try {
             int itemImage = itemInformationImage.get(position);
             holder.listItemImage.setImageResource(itemImage);
-            Log.d(TAG,"Image created correctly");
         }
         catch (Exception e){
-            holder.listItemImage.setImageResource(R.mipmap.ic_launcher);
-            Log.d(TAG,"Image created not correctly");
+            holder.listItemImage.setImageResource(R.drawable.unknown);
         }
 
     }
@@ -147,7 +135,6 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
             return 0;
         }
 
-        Log.d(TAG,""+itemInformationName.size()+itemInformationDate.size()+itemInformationImage.size());
         return itemInformationName.size();
     }
 
@@ -156,7 +143,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
 
         itemInformationName = informationName;
         itemInformationDate = informationDate;
-        //       itemInformationImage = informationImage;
+        itemInformationImage = informationImage;
 
         notifyDataSetChanged();
     }
@@ -165,9 +152,9 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
 
         itemInformationName = MainActivity.db.getItemsName();
         itemInformationDate = MainActivity.db.getItemsDate();
+        itemInformationImage = getRelativeImages(itemInformationName);
         notifyItemInserted(MainActivity.db.getItemsName().size());
 
-        Log.d(TAG,"addItem reached");
     }
 
     public ArrayList<Integer> getRelativeImages(ArrayList<String> _itemNames) {
@@ -184,9 +171,12 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
                             (_itemName.contains("Yogurt")) || (_itemName.contains("YOGURT")) || (_itemName.contains("yogurt")) ||
                             (_itemName.contains("Yogurt")) || (_itemName.contains("YOGURT")) || (_itemName.contains("yogurt")) ||
                             (_itemName.contains("Cream")) || (_itemName.contains("CREAM")) || (_itemName.contains("cream"))
-                    ) {
+                    )
+            {
+                Log.d(TAG,"Dairy");
                 list.add(R.drawable.dairy);
-            } else if (
+            }
+            else if (
                     (_itemName.contains("Meat")) || (_itemName.contains("MEAT")) || (_itemName.contains("meat")) ||
                             (_itemName.contains("Steak")) || (_itemName.contains("STEAK")) || (_itemName.contains("steak")) ||
                             (_itemName.contains("Ham")) || (_itemName.contains("HAM")) || (_itemName.contains("ham")) ||
@@ -201,10 +191,30 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
                             (_itemName.contains("Pork")) || (_itemName.contains("PORK")) || (_itemName.contains("pork")) ||
                             (_itemName.contains("Turkey")) || (_itemName.contains("TURKEY")) || (_itemName.contains("turkey")) ||
                             (_itemName.contains("Hot dog")) || (_itemName.contains("HOT DOG")) || (_itemName.contains("hot dog"))
-                    ) {
+                    )
+            {
+                Log.d(TAG,"Meat");
                 list.add(R.drawable.meat);
-            } else {
-                list.add(R.mipmap.ic_launcher);
+            }
+            else if (
+                    (_itemName.contains("Pepper")) || (_itemName.contains("PEPPER")) || (_itemName.contains("pepper")) ||
+                            (_itemName.contains("Salad")) || (_itemName.contains("SALAD")) || (_itemName.contains("salad")) ||
+                            (_itemName.contains("Broccoli")) || (_itemName.contains("BROCCOLI")) || (_itemName.contains("broccoli")) ||
+                            (_itemName.contains("Cabbage")) || (_itemName.contains("CABBAGE")) || (_itemName.contains("cabbage")) ||
+                            (_itemName.contains("Carrot")) || (_itemName.contains("CARROT")) || (_itemName.contains("carrot")) ||
+                            (_itemName.contains("Lettuce")) || (_itemName.contains("LETTUCE")) || (_itemName.contains("lettuce")) ||
+                            (_itemName.contains("Onion")) || (_itemName.contains("ONION")) || (_itemName.contains("onion")) ||
+                            (_itemName.contains("Spinach")) || (_itemName.contains("SPINACH")) || (_itemName.contains("spinach")) ||
+                            (_itemName.contains("Tomato")) || (_itemName.contains("TOMATO")) || (_itemName.contains("tomato")) ||
+                            (_itemName.contains("Zucchini")) || (_itemName.contains("ZUCCHINI")) || (_itemName.contains("zucchini"))
+                    ){
+                list.add(R.drawable.pepper);
+            }
+            //Todo fish
+            else
+            {
+                Log.d(TAG,"Exception");
+                list.add(R.drawable.unknown);
             }
         }
 
