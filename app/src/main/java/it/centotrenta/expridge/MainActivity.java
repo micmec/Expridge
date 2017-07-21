@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     // Click handling
     @Override
-    public void onClick(View view, String itemInformationName, long itemInformationDate) {
+    public void onClick(View view, final String itemInformationName, final long itemInformationDate) {
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
+                        deletePartOfTheMethod(itemInformationName,itemInformationDate);
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-        builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+        builder.setMessage("Are you sure you want to delete " + itemInformationName + "?").setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
 
         //TODO the dialog does not execute the method below yet

@@ -85,7 +85,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         ArrayList<String> mList = new ArrayList<>();
 
-        Cursor cursor = database.rawQuery("SELECT " + ITEM_NAME_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN + " DESC",null);
+        Cursor cursor = database.rawQuery("SELECT " + ITEM_NAME_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN,null);
         cursor.moveToFirst();
 
         while(!cursor.isAfterLast()){
@@ -110,8 +110,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         ArrayList<String> mList = new ArrayList<>();
 
-            Cursor cursor = database.rawQuery("SELECT " + ITEM_DATE_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN
-                    + " DESC", null);
+            Cursor cursor = database.rawQuery("SELECT " + ITEM_DATE_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
