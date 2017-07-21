@@ -2,14 +2,16 @@ package it.centotrenta.expridge;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 /**
@@ -27,20 +29,21 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
     private ArrayList<String> itemInformationName;
     private ArrayList<String> itemInformationDate;
     private ArrayList<Integer> itemInformationImage;
-    private String TAG = "ImageResolution";
+    private DBHandler databaseHandler;
 
     // Inner interface for the click handling
     public interface ListItemsAdapterClickHandler {
-        void onClick(String itemNameInf, String itemDateInf);
+        void onClick(View view, String itemNameInf, long itemDateInf);
     }
 
 
     // Constructor
     public ListItemsAdapter(ListItemsAdapterClickHandler clickHandler) {
+        databaseHandler = MainActivity.dataBaseHandler;
         listClickHandler = clickHandler;
-        itemInformationName = MainActivity.db.getItemsName();
-        itemInformationDate = MainActivity.db.getItemsDate();
-        itemInformationImage = getRelativeImages(MainActivity.db.getItemsName());
+        itemInformationName = databaseHandler.getNamesFromColumn();
+        itemInformationDate = databaseHandler.getDatesFromColumn();
+        itemInformationImage = getRelativeImages(itemInformationName);
     }
 
 
@@ -72,13 +75,19 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         @Override
         public void onClick(View v) {
 
-            //TODO click handling missing & wrong way of using data (we are passing just the name
             int adapterPosition = getAdapterPosition();
             String itemName = itemInformationName.get(adapterPosition);
             String itemDate = itemInformationDate.get(adapterPosition);
-            int itemImage = itemInformationImage.get(adapterPosition);
-            listClickHandler.onClick(itemName, itemDate);
-            //todo click handling does not work because it involves the images, see todo at the top.
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = null;
+            try {
+                date = sdf.parse(itemDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            long itemDateMilli = date.getTime();
+            listClickHandler.onClick(v,itemName, itemDateMilli);
+
         }
     }
 
@@ -111,19 +120,24 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
     public void onBindViewHolder(ListAdapterViewHolder holder, int position) {
 
         // Get the information
-        String itemName = itemInformationName.get(position);
-        String itemDate = itemInformationDate.get(position);
-
-        // And assign it
-        holder.listItemName.setText(itemName);
-        holder.listItemDate.setText(itemDate);
-
-        try {
-            int itemImage = itemInformationImage.get(position);
-            holder.listItemImage.setImageResource(itemImage);
+        try
+        {
+            String itemName = itemInformationName.get(position);
+            String itemDate = itemInformationDate.get(position);
+            holder.listItemName.setText(itemName);
+            holder.listItemDate.setText(itemDate);
+            try {
+                int itemImage = itemInformationImage.get(position);
+                holder.listItemImage.setImageResource(itemImage);
+            }
+            catch (Exception e){
+                holder.listItemImage.setImageResource(R.drawable.unknown);
+            }
         }
-        catch (Exception e){
-            holder.listItemImage.setImageResource(R.drawable.unknown);
+        catch(Exception e){
+
+            e.printStackTrace();
+
         }
 
     }
@@ -138,7 +152,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         return itemInformationName.size();
     }
 
-    // Create a method for assigning new data to the item, without creating a new ViewHolder
+    // Create a method for assigning new data to the item, without creating a new ViewHolder TODO : we might need it in future
     public void setItemData(ArrayList<String> informationName, ArrayList<String> informationDate, ArrayList<Integer> informationImage) {
 
         itemInformationName = informationName;
@@ -150,10 +164,11 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
 
     public void addItem() {
 
-        itemInformationName = MainActivity.db.getItemsName();
-        itemInformationDate = MainActivity.db.getItemsDate();
+        if(!databaseHandler.getNamesFromColumn().isEmpty() && !databaseHandler.getDatesFromColumn().isEmpty())
+        itemInformationName = databaseHandler.getNamesFromColumn();
+        itemInformationDate = databaseHandler.getDatesFromColumn();
         itemInformationImage = getRelativeImages(itemInformationName);
-        notifyItemInserted(MainActivity.db.getItemsName().size());
+        notifyItemInserted(itemInformationName.size());
 
     }
 
@@ -173,7 +188,6 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
                             (_itemName.contains("Cream")) || (_itemName.contains("CREAM")) || (_itemName.contains("cream"))
                     )
             {
-                Log.d(TAG,"Dairy");
                 list.add(R.drawable.dairy);
             }
             else if (
@@ -193,7 +207,6 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
                             (_itemName.contains("Hot dog")) || (_itemName.contains("HOT DOG")) || (_itemName.contains("hot dog"))
                     )
             {
-                Log.d(TAG,"Meat");
                 list.add(R.drawable.meat);
             }
             else if (
@@ -213,11 +226,20 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
             //Todo fish
             else
             {
-                Log.d(TAG,"Exception");
                 list.add(R.drawable.unknown);
             }
         }
 
         return list;
     }
+
+    public void loadDB(){
+
+        itemInformationName = databaseHandler.getNamesFromColumn();
+        itemInformationDate = databaseHandler.getDatesFromColumn();
+        itemInformationImage = getRelativeImages(itemInformationName);
+        notifyItemRemoved(itemInformationName.size() + 1);
+
+    }
+
 }

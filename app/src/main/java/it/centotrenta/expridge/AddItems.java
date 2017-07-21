@@ -16,6 +16,7 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
     private EditText nameInput;
     private CalendarView dateInput;
     private Button button;
+    private DBHandler dbHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -23,6 +24,7 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
         setContentView(R.layout.activity_add_items);
 
         // Get a handle on the views
+        dbHandler = MainActivity.dataBaseHandler;
         nameInput = (EditText) findViewById(R.id.name_input);
         dateInput = (CalendarView) findViewById(R.id.calendarView);
         dateInput.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -57,10 +59,10 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
 
         // Get the values
         String name = nameInput.getText().toString();
-        long dateMilli = dateInput.getDate();
+        long dateMill = dateInput.getDate();
 
         // Change the main activity db
-        MainActivity.db.addItem(new Items(name,dateMilli));
+        dbHandler.addItem(name,dateMill);
 
         // Get back to the activity
         super.onBackPressed();

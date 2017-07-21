@@ -1,8 +1,10 @@
 package it.centotrenta.expridge;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,21 +14,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements ListItemsAdapter.ListItemsAdapterClickHandler {
 
     // Our variables
+    public static DBHandler dataBaseHandler;
     private RecyclerView mRecyclerView;
     private static ListItemsAdapter mAdapter;
     private TextView mErrorMessageView;
     private ProgressBar mProgressBar;
     private FloatingActionButton mButton;
-    public static Database db = new Database();
-
-    /*
-    TODO create the AsyncTask process for getting information on the items (idea) and so use the showErrorMessage/showListItems
-    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         mErrorMessageView = (TextView) findViewById(R.id.list_activity_errorMessage);
         mProgressBar = (ProgressBar) findViewById(R.id.list_activity_progressBar);
         mButton = (FloatingActionButton) findViewById(R.id.red_button);
+        dataBaseHandler = new DBHandler(this);
 
         // LayoutManager handling
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
@@ -82,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         int id = item.getItemId();
 
         if(id == R.id.add_item_menu){
-            Toast.makeText(this,"Menu Clicked",Toast.LENGTH_SHORT).show(); //Todo use it or delete it
+
         }
 
         // Safe case
@@ -92,10 +90,36 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     // Click handling
     @Override
-    public void onClick(String itemInformationName,String itemInformationDate) {
+    public void onClick(View view, String itemInformationName, long itemInformationDate) {
 
-        Toast.makeText(this,"Clicked",Toast.LENGTH_LONG).show();
-        //todo
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //Yes button clicked
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+
+        //TODO the dialog does not execute the method below yet
+
+    }
+
+    public void deletePartOfTheMethod(String itemInformationName, long itemInformationDate){
+
+        dataBaseHandler.deleteItem(itemInformationName,itemInformationDate);
+        mAdapter.loadDB();
+        mRecyclerView.setAdapter(mAdapter);
 
     }
 
