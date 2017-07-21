@@ -10,10 +10,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 
 //TODO install notifications when an item is expiring in the next 2 days
 
@@ -25,8 +27,10 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     private static ListItemsAdapter mAdapter;
     private TextView mErrorMessageView;
     private ProgressBar mProgressBar;
-    private FloatingActionButton mButton;
+    private FloatingActionButton mFab,nFab,fFab;
     private TextView mNoItems;
+    private Animation FabOpen,FabClose,FabRotClock,FabRotAnti;
+    boolean isOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +41,47 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         mRecyclerView = (RecyclerView) findViewById(R.id.list_activity_recyclerView);
         mErrorMessageView = (TextView) findViewById(R.id.list_activity_errorMessage);
         mProgressBar = (ProgressBar) findViewById(R.id.list_activity_progressBar);
-        mButton = (FloatingActionButton) findViewById(R.id.red_button);
         mNoItems = (TextView) findViewById(R.id.no_items_view);
         dataBaseHandler = new DBHandler(this);
+
+        // Animations
+        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
+        FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        FabRotClock = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_rotate);
+        FabRotAnti = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_rotate_back);
+
+        // FAB
+        mFab = (FloatingActionButton) findViewById(R.id.red_button);
+        nFab = (FloatingActionButton) findViewById(R.id.manually_button);
+        fFab = (FloatingActionButton) findViewById(R.id.photo_button);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(isOpen){
+
+                    nFab.startAnimation(FabClose);
+                    fFab.startAnimation(FabClose);
+                    mFab.startAnimation(FabRotAnti);
+                    nFab.setClickable(false);
+                    fFab.setClickable(false);
+                    isOpen = false;
+
+
+                }
+                else{
+
+                    nFab.startAnimation(FabOpen);
+                    fFab.startAnimation(FabOpen);
+                    mFab.startAnimation(FabRotClock);
+                    nFab.setClickable(true);
+                    fFab.setClickable(true);
+                    isOpen = true;
+
+                }
+
+            }
+        });
 
         // LayoutManager handling
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
@@ -83,20 +125,20 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     }
 
     // When the item is selected
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        // Get the item id
-        int id = item.getItemId();
-
-        if(id == R.id.add_item_menu){
-            //TODO
-        }
-
-        // Safe case
-        return super.onOptionsItemSelected(item);
-
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//
+//        // Get the item id
+//        int id = item.getItemId();
+//
+//        if(id == R.id.add_item_menu){
+//            //TODO
+//        }
+//
+//        // Safe case
+//        return super.onOptionsItemSelected(item);
+//
+//    }
 
     // Click handling
     @Override

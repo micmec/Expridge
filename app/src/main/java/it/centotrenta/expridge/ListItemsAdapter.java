@@ -230,7 +230,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
                     ){
                 list.add(R.drawable.pepper);
             }
-            //Todo fish
+            //Todo fish and if it is unknown might add it to the categories
             else
             {
                 list.add(R.drawable.unknown);

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/list_layout"
     tools:context="it.centotrenta.expridge.MainActivity">
 
@@ -33,14 +35,43 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/red_button"
         android:backgroundTint="@color/colorAccent"
-        android:elevation="3dp"
-        android:src="@drawable/add_button"
-        android:focusableInTouchMode="true"
+        android:elevation="6dp"
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:layout_marginBottom="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="15dp"
-        android:onClick="redButtonAction" />
+        app:pressedTranslationZ="12dp"
+        android:layout_marginRight="16dp"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/manually_button"
+        android:backgroundTint="#DDB06E"
+        android:elevation="6dp"
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:pressedTranslationZ="12dp"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="16dp"
+        android:visibility="invisible"
+        android:onClick="redButtonAction"
+        android:src="@android:drawable/ic_menu_manage" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/photo_button"
+        android:backgroundTint="#C5DC92"
+        android:elevation="6dp"
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:pressedTranslationZ="12dp"
+        android:layout_marginBottom="145dp"
+        android:layout_marginRight="16dp"
+        android:visibility="invisible"
+        android:src="@android:drawable/ic_menu_camera" />
 
     <TextView
         android:id="@+id/no_items_view"
@@ -52,4 +83,4 @@
         android:textSize="20sp"
         android:visibility="invisible"/>
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>
