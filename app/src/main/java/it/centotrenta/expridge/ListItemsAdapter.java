@@ -2,6 +2,7 @@ package it.centotrenta.expridge;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +30,12 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
     private ArrayList<String> itemInformationName;
     private ArrayList<String> itemInformationDate;
     private ArrayList<Integer> itemInformationImage;
+    private ArrayList<Integer> itemInformationId;
     private DBHandler databaseHandler;
 
     // Inner interface for the click handling
     public interface ListItemsAdapterClickHandler {
-        void onClick(View view, String itemNameInf, long itemDateInf);
+        void onClick(View view, String itemNameInf, int id);
     }
 
 
@@ -44,6 +46,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         itemInformationName = databaseHandler.getNamesFromColumn();
         itemInformationDate = databaseHandler.getDatesFromColumn();
         itemInformationImage = getRelativeImages(itemInformationName);
+        itemInformationId = databaseHandler.getIdFromColumn();
     }
 
 
@@ -75,9 +78,12 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         @Override
         public void onClick(View v) {
 
+            Log.d("M",""+itemInformationId.size()+itemInformationName.size()+itemInformationDate.size());
+
             int adapterPosition = getAdapterPosition();
             String itemName = itemInformationName.get(adapterPosition);
             String itemDate = itemInformationDate.get(adapterPosition);
+            int id = itemInformationId.get(adapterPosition);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date date = null;
             try {
@@ -86,7 +92,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
                 e.printStackTrace();
             }
             long itemDateMilli = date.getTime();
-            listClickHandler.onClick(v,itemName, itemDateMilli);
+            listClickHandler.onClick(v,itemName,id);
 
         }
     }
@@ -168,6 +174,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         itemInformationName = databaseHandler.getNamesFromColumn();
         itemInformationDate = databaseHandler.getDatesFromColumn();
         itemInformationImage = getRelativeImages(itemInformationName);
+        itemInformationId = databaseHandler.getIdFromColumn();
         notifyItemInserted(itemInformationName.size());
 
     }
@@ -238,6 +245,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         itemInformationName = databaseHandler.getNamesFromColumn();
         itemInformationDate = databaseHandler.getDatesFromColumn();
         itemInformationImage = getRelativeImages(itemInformationName);
+        itemInformationId = databaseHandler.getIdFromColumn();
         notifyItemRemoved(itemInformationName.size() + 1);
 
     }

@@ -29,14 +29,27 @@
         android:textSize="20sp"
         android:visibility="invisible"/>
 
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/red_button"
         android:backgroundTint="@color/colorAccent"
         android:elevation="3dp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:src="@drawable/add_button"
+        android:focusableInTouchMode="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="10dp"
+        android:layout_margin="15dp"
         android:onClick="redButtonAction" />
+
+    <TextView
+        android:id="@+id/no_items_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_gravity="center"
+        android:text="@string/no_items"
+        android:textSize="20sp"
+        android:visibility="invisible"/>
 
 </FrameLayout>

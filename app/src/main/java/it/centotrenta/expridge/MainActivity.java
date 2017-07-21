@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+//TODO install notifications when an item is expiring in the next 2 days
+
 public class MainActivity extends AppCompatActivity implements ListItemsAdapter.ListItemsAdapterClickHandler {
 
     // Our variables
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     private TextView mErrorMessageView;
     private ProgressBar mProgressBar;
     private FloatingActionButton mButton;
+    private TextView mNoItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         mErrorMessageView = (TextView) findViewById(R.id.list_activity_errorMessage);
         mProgressBar = (ProgressBar) findViewById(R.id.list_activity_progressBar);
         mButton = (FloatingActionButton) findViewById(R.id.red_button);
+        mNoItems = (TextView) findViewById(R.id.no_items_view);
         dataBaseHandler = new DBHandler(this);
 
         // LayoutManager handling
@@ -46,15 +50,21 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         mAdapter = new ListItemsAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
+        // Check for the items
+        noItemsMethod();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-            // We reconstruct the adapter from the new data
-            mAdapter.addItem();
-            mRecyclerView.setAdapter(mAdapter);
+        // We reconstruct the adapter from the new data
+        mAdapter.addItem();
+        mRecyclerView.setAdapter(mAdapter);
+
+        // Check for the items
+        noItemsMethod();
 
     }
 
@@ -80,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         int id = item.getItemId();
 
         if(id == R.id.add_item_menu){
-
+            //TODO
         }
 
         // Safe case
@@ -90,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     // Click handling
     @Override
-    public void onClick(View view, final String itemInformationName, final long itemInformationDate) {
+    public void onClick(View view, String itemInformationName, final int id) {
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -98,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
-                        deletePartOfTheMethod(itemInformationName,itemInformationDate);
+                        deletePartOfTheMethod(id);
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -117,11 +127,12 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     }
 
-    public void deletePartOfTheMethod(String itemInformationName, long itemInformationDate){
+    public void deletePartOfTheMethod(int id){
 
-        dataBaseHandler.deleteItem(itemInformationName,itemInformationDate);
+        dataBaseHandler.deleteItem(id);
         mAdapter.loadDB();
         mRecyclerView.setAdapter(mAdapter);
+        noItemsMethod();
 
     }
 
@@ -136,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     private void showItemsDataView() {
         /* First, make sure the error is invisible */
         mErrorMessageView.setVisibility(View.INVISIBLE);
+        mNoItems.setVisibility(View.INVISIBLE);
         /* Then, make sure the weather data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     }
@@ -145,6 +157,20 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         mRecyclerView.setVisibility(View.INVISIBLE);
         /* Then, show the error */
         mErrorMessageView.setVisibility(View.VISIBLE);
+    }
+
+    private void noItemsMethod(){
+
+        if(dataBaseHandler.isDBNil()){
+
+            mRecyclerView.setVisibility(View.INVISIBLE);
+            mNoItems.setVisibility(View.VISIBLE);
+
+        }
+        else{
+            showItemsDataView();
+        }
+
     }
 
 }

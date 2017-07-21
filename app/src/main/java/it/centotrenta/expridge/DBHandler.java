@@ -66,14 +66,14 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
-    public void deleteItem(String name, long date){
+    public void deleteItem(int id){
 
         SQLiteDatabase database = getWritableDatabase();
 
 
         database.execSQL("DELETE FROM " + TABLE_NAME + " WHERE "
-                        + ITEM_NAME_COLUMN + " =\"" + name + "\";"); //AND " + ITEM_DATE_COLUMN + " =\"" + date + "\";");
-        //CONSIDER NOT DELETING BUT CHANGING STATUS TODO this method deletes all the items with that name. Add the ID param.
+                        + ITEM_ID_COLUMN + " =\"" + id + "\";");
+        //CONSIDER NOT DELETING BUT CHANGING STATUS
         database.close();
 
     }
@@ -126,6 +126,29 @@ public class DBHandler extends SQLiteOpenHelper {
         return mList;
     }
 
+    public ArrayList<Integer> getIdFromColumn(){
+
+        SQLiteDatabase database = getWritableDatabase();
+
+        ArrayList<Integer> mList = new ArrayList<>();
+
+        Cursor cursor = database.rawQuery("SELECT " + ITEM_ID_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+
+            mList.add(cursor.getInt(cursor.getColumnIndex(ITEM_ID_COLUMN)));
+            cursor.moveToNext();
+
+        }
+        cursor.close();
+        database.close();
+
+
+        return mList;
+    }
+
+
     public String toDate(long milliSeconds, String format){
 
         SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -139,5 +162,11 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public SQLiteDatabase getReadableDatabase() {
         return super.getReadableDatabase();
+    }
+
+    public boolean isDBNil(){
+
+        return getNamesFromColumn().isEmpty();
+
     }
 }
