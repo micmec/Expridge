@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
             }
         };
 
+
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         builder.setMessage("Are you sure you want to delete " + itemInformationName + "?").setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
