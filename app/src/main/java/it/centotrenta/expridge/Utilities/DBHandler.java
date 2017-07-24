@@ -1,19 +1,21 @@
-package it.centotrenta.expridge;
+package it.centotrenta.expridge.Utilities;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import it.centotrenta.expridge.ListItemsAdapter;
+
 /**
  * Created by michelangelomecozzi on 20/07/2017.
  * <p>
- * 130 si volaa!
  */
 
 public class DBHandler extends SQLiteOpenHelper {
@@ -64,6 +66,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
         }
 
+        ListItemsAdapter.dateForNotification = date;
+
     }
 
     public void deleteItem(int id){
@@ -80,7 +84,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public ArrayList<String> getNamesFromColumn(){
 
-        SQLiteDatabase database = getWritableDatabase();
+        SQLiteDatabase database = getReadableDatabase();
 
 
         ArrayList<String> mList = new ArrayList<>();
@@ -106,7 +110,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public ArrayList<String> getDatesFromColumn(){
 
-        SQLiteDatabase database = getWritableDatabase();
+        SQLiteDatabase database = getReadableDatabase();
 
         ArrayList<String> mList = new ArrayList<>();
 
@@ -124,6 +128,38 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
         return mList;
+    }
+
+    public long getSpecificDate(int id){
+
+        Log.d("Eccezioneeeee",""+id);
+
+        SQLiteDatabase database = getReadableDatabase();
+
+        Cursor cursor= database.rawQuery("SELECT " + ITEM_DATE_COLUMN + " FROM " + TABLE_NAME + " WHERE "
+                + ITEM_ID_COLUMN + " = " + id + " ;", null);
+
+        long date = cursor.getLong(cursor.getColumnIndex(ITEM_DATE_COLUMN));
+
+        cursor.close();
+        database.close();
+
+        return date;
+
+    }
+
+    public int getLastId(){
+
+        SQLiteDatabase database = getReadableDatabase();
+
+        Cursor cursor= database.rawQuery("SELECT " + ITEM_ID_COLUMN + " FROM " + TABLE_NAME + " WHERE " + ITEM_NAME_COLUMN
+                + " IS NOT NULL" , null);
+        cursor.moveToLast();
+
+        int id = cursor.getInt(cursor.getColumnIndex(ITEM_ID_COLUMN));
+
+        return id;
+
     }
 
     public ArrayList<Integer> getIdFromColumn(){

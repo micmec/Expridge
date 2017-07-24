@@ -26,6 +26,17 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <receiver
+            android:name=".Utilities.NotificationBroadcast"
+            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name=".Utilities.ExpridgeIntentService"
+            android:exported="false" />
+
+        <activity android:name=".AlarmActivity"></activity>
     </application>
 
 </manifest>

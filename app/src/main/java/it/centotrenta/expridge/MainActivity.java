@@ -1,7 +1,11 @@
 package it.centotrenta.expridge;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -10,14 +14,27 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import it.centotrenta.expridge.Utilities.DBHandler;
+import it.centotrenta.expridge.Utilities.NotificationBroadcast;
 
 
 //TODO install notifications when an item is expiring in the next 2 days
+//TODO consider creating a dialog when setting notifications to let the user choose
+//TODO find better icons since these suck
+//TODO add more settings or fill in the space of the setting part
+//TODO BUG, moving icon for notifications
+//TODO BUG, notifications cancel each other
+//TODO dialog if he puts an item with double keyword
+//TODO make the button for adding go back and the two buttons on items go back after 5 seconds
 
 public class MainActivity extends AppCompatActivity implements ListItemsAdapter.ListItemsAdapterClickHandler {
 
@@ -31,6 +48,11 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     private TextView mNoItems;
     private Animation FabOpen,FabClose,FabRotClock,FabRotAnti;
     boolean isOpen = false;
+    static boolean isOpenTwo;
+    static boolean isNotificationOn;
+    public static final String MY_PREFS_NAME = "MyPrefsFile";
+    private ImageView arrowNoItems;
+    static boolean isFirstOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         mProgressBar = (ProgressBar) findViewById(R.id.list_activity_progressBar);
         mNoItems = (TextView) findViewById(R.id.no_items_view);
         dataBaseHandler = new DBHandler(this);
+        arrowNoItems = (ImageView) findViewById(R.id.arrow_no_items);
 
         // Animations
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
@@ -102,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         super.onResume();
 
         // We reconstruct the adapter from the new data
-        mAdapter.addItem();
+        mAdapter.addItem(this);
         mRecyclerView.setAdapter(mAdapter);
 
         // Check for the items
@@ -125,48 +148,112 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     }
 
     // When the item is selected
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//
-//        // Get the item id
-//        int id = item.getItemId();
-//
-//        if(id == R.id.add_item_menu){
-//            //TODO
-//        }
-//
-//        // Safe case
-//        return super.onOptionsItemSelected(item);
-//
-//    }
-
-    // Click handling
     @Override
-    public void onClick(View view, String itemInformationName, final int id) {
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        //Yes button clicked
-                        deletePartOfTheMethod(id);
-                        break;
+        // Get the item id
+        int id = item.getItemId();
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
+        if(id == R.id.add_item_menu){
+            Intent intent = new Intent(this, AlarmActivity.class);
+            startActivity(intent);
+        }
+
+        // Safe case
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    @Override
+    public void onClick(final View view, final int id, final String itemInfoName, final long time,
+                        ImageView dButton, final ImageView alarmButton, final String dateFormatted) {
+
+            if (isOpenTwo) {
+
+                dButton.startAnimation(FabClose);
+                alarmButton.startAnimation(FabClose);
+                isOpenTwo = false;
+                if(!isNotificationOn){
+                    alarmButton.setImageResource(R.drawable.notifications);
                 }
+                else {
+                    alarmButton.setImageResource(R.drawable.notifications_off);
+                }
+                dButton.setImageResource(R.drawable.cancel);
+                dButton.setClickable(false);
+                alarmButton.setClickable(false);
+
             }
-        };
+            else {
+
+                dButton.startAnimation(FabOpen);
+                alarmButton.startAnimation(FabOpen);
+                dButton.setClickable(true);
+                alarmButton.setClickable(true);
+                isOpenTwo = true;
+                if(!isNotificationOn){
+                    alarmButton.setImageResource(R.drawable.notifications);
+                }
+                else {
+                    alarmButton.setImageResource(R.drawable.notifications_off);
+                }
+                dButton.setImageResource(R.drawable.cancel);
+
+            }
+
+        if(isFirstOpen) {
+
+            dButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    //Yes button clicked
+                                    deletePartOfTheMethod(id);
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setMessage("Are you sure you want to delete " + itemInfoName + "?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-        builder.setMessage("Are you sure you want to delete " + itemInformationName + "?").setPositiveButton("Yes", dialogClickListener)
-                .setNegativeButton("No", dialogClickListener).show();
+                }
+            });
 
-        //TODO the dialog does not execute the method below yet
+            alarmButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                    if (!isNotificationOn) {
+
+                        alarmButton.setImageResource(R.drawable.notifications_off);
+                        setNotification(MainActivity.this, time, id, itemInfoName, dateFormatted);
+                        isNotificationOn = true;
+
+                    } else {
+
+                        alarmButton.setImageResource(R.drawable.notifications);
+                        deleteNotification(MainActivity.this, id, itemInfoName);
+                        isNotificationOn = false;
+
+                    }
+
+
+                }
+            });
+            isFirstOpen = false;
+        }
     }
 
     public void deletePartOfTheMethod(int id){
@@ -190,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         /* First, make sure the error is invisible */
         mErrorMessageView.setVisibility(View.INVISIBLE);
         mNoItems.setVisibility(View.INVISIBLE);
+        arrowNoItems.setVisibility(View.INVISIBLE);
         /* Then, make sure the weather data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     }
@@ -207,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
             mRecyclerView.setVisibility(View.INVISIBLE);
             mNoItems.setVisibility(View.VISIBLE);
+            arrowNoItems.setVisibility(View.VISIBLE);
 
         }
         else{
@@ -215,5 +304,37 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     }
 
-}
+    public void setNotification(Context context, long time,int id, String itemName,String dateFormatted){
 
+        SharedPreferences pref = getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
+        int howBefore = pref.getInt("alarmValue",8400000);
+
+        Intent notifyIntent = new Intent(context,NotificationBroadcast.class);
+        notifyIntent.putExtra("id",id);
+        notifyIntent.putExtra("itemName",itemName);
+        notifyIntent.putExtra("itemDate",dateFormatted);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast
+                (context,id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP,time-howBefore,pendingIntent);
+
+        Toast.makeText(this,"Notification on for " + itemName, Toast.LENGTH_SHORT).show();
+
+        //TODO bug, create an if statement for avoiding notifications in cases of selecting the same day or the next one
+
+    }
+
+    public void deleteNotification(Context context,int id,String itemName){
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent notifyIntent = new Intent(context,NotificationBroadcast.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast
+                (context,id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.cancel(pendingIntent);
+
+        Toast.makeText(this,"Notification off for " + itemName, Toast.LENGTH_SHORT).show();
+
+    }
+
+
+}

@@ -2,28 +2,26 @@ package it.centotrenta.expridge;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+
+import it.centotrenta.expridge.Utilities.DBHandler;
+
 
 
 /**
  ** Created by michelangelomecozzi on 02/07/17.
  ** <p>
- ** 130 si volaa!
  **/
 
 //TODO work on the images
 
-class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapterViewHolder> {
+public class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapterViewHolder> {
 
     //Variables
     private ListItemsAdapterClickHandler listClickHandler;
@@ -32,31 +30,36 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
     private ArrayList<Integer> itemInformationImage;
     private ArrayList<Integer> itemInformationId;
     private DBHandler databaseHandler;
+    public static long dateForNotification;
 
     // Inner interface for the click handling
     public interface ListItemsAdapterClickHandler {
-        void onClick(View view, String itemNameInf, int id);
+        void onClick(View view, int id, String itemInfoName, long time,ImageView deleteButton,ImageView alarmButton,
+                     String dateFormatted);
     }
 
-
     // Constructor
-    public ListItemsAdapter(ListItemsAdapterClickHandler clickHandler) {
+    public ListItemsAdapter(ListItemsAdapterClickHandler clickHandler){ //ListItemsAdapterLongClickHandler longClickHandler) {
         databaseHandler = MainActivity.dataBaseHandler;
         listClickHandler = clickHandler;
         itemInformationName = databaseHandler.getNamesFromColumn();
         itemInformationDate = databaseHandler.getDatesFromColumn();
         itemInformationImage = getRelativeImages(itemInformationName);
         itemInformationId = databaseHandler.getIdFromColumn();
+
+
     }
 
 
     // Inner class for the view holder
-    public class ListAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ListAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{//,View.OnLongClickListener {
 
         // Variables
         public final TextView listItemName;
         public final TextView listItemDate;
         public final ImageView listItemImage;
+        public final ImageView deleteButton;
+        public final ImageView alarmButton;
 
         // Constructor
         protected ListAdapterViewHolder(View view) {
@@ -68,6 +71,8 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
             listItemName = (TextView) view.findViewById(R.id.name_of_food);
             listItemDate = (TextView) view.findViewById(R.id.date_of_food);
             listItemImage = (ImageView) view.findViewById(R.id.food_image);
+            deleteButton = (ImageView) view.findViewById(R.id.delete_button);
+            alarmButton = (ImageView) view.findViewById(R.id.alarm_button);
 
             // Click handling
             view.setOnClickListener(this);
@@ -78,23 +83,15 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         @Override
         public void onClick(View v) {
 
-            Log.d("M",""+itemInformationId.size()+itemInformationName.size()+itemInformationDate.size());
-
             int adapterPosition = getAdapterPosition();
             String itemName = itemInformationName.get(adapterPosition);
-            String itemDate = itemInformationDate.get(adapterPosition);
+            String dateFormatted = itemInformationDate.get(adapterPosition);
             int id = itemInformationId.get(adapterPosition);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            Date date = null;
-            try {
-                date = sdf.parse(itemDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            long itemDateMilli = date.getTime();
-            listClickHandler.onClick(v,itemName,id);
+
+            listClickHandler.onClick(v,id,itemName,dateForNotification,deleteButton,alarmButton,dateFormatted);
 
         }
+
     }
 
     // Override the method for the creation of the ViewHolders
@@ -116,8 +113,12 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         // Create the ViewHolder from the previous information
         View view = inflater.inflate(layoutId, parent, shouldAttachToParentImmediately);
 
-        return new ListAdapterViewHolder(view);
+        // When we create it, we set the notifications and button appearance to be off
+        MainActivity.isNotificationOn = false;
+        MainActivity.isOpenTwo = false;
+        MainActivity.isFirstOpen = true;
 
+        return new ListAdapterViewHolder(view);
 
     }
 
@@ -168,14 +169,17 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         notifyDataSetChanged();
     }
 
-    public void addItem() {
+    public void addItem(Context context) {
 
-        if(!databaseHandler.getNamesFromColumn().isEmpty() && !databaseHandler.getDatesFromColumn().isEmpty())
-        itemInformationName = databaseHandler.getNamesFromColumn();
-        itemInformationDate = databaseHandler.getDatesFromColumn();
-        itemInformationImage = getRelativeImages(itemInformationName);
-        itemInformationId = databaseHandler.getIdFromColumn();
-        notifyItemInserted(itemInformationName.size());
+        if(!databaseHandler.getNamesFromColumn().isEmpty() && !databaseHandler.getDatesFromColumn().isEmpty()) {
+
+            itemInformationName = databaseHandler.getNamesFromColumn();
+            itemInformationDate = databaseHandler.getDatesFromColumn();
+            itemInformationImage = getRelativeImages(itemInformationName);
+            itemInformationId = databaseHandler.getIdFromColumn();
+
+            notifyItemInserted(itemInformationName.size());
+        }
 
     }
 
@@ -228,7 +232,7 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
                             (_itemName.contains("Tomato")) || (_itemName.contains("TOMATO")) || (_itemName.contains("tomato")) ||
                             (_itemName.contains("Zucchini")) || (_itemName.contains("ZUCCHINI")) || (_itemName.contains("zucchini"))
                     ){
-                list.add(R.drawable.pepper);
+                list.add(R.drawable.vedgetables);
             }
             //Todo fish and if it is unknown might add it to the categories
             else
@@ -240,13 +244,13 @@ class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapter
         return list;
     }
 
-    public void loadDB(){
+    public void loadDB() {
 
         itemInformationName = databaseHandler.getNamesFromColumn();
         itemInformationDate = databaseHandler.getDatesFromColumn();
         itemInformationImage = getRelativeImages(itemInformationName);
         itemInformationId = databaseHandler.getIdFromColumn();
-        notifyItemRemoved(itemInformationName.size() + 1);
+        notifyItemRemoved(itemInformationName.size() + 1); //TODO check if we can use notifyDataSetChanged()
 
     }
 

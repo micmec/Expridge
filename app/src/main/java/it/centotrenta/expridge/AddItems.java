@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 
+import it.centotrenta.expridge.Utilities.DBHandler;
+
 
 public class AddItems extends AppCompatActivity implements View.OnClickListener {
 
