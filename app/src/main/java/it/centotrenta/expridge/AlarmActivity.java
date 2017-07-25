@@ -29,6 +29,10 @@ public class AlarmActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+        SharedPreferences pref = getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
+        int id = pref.getInt("idAlarm",0);
+        spinner.setSelection(id);
+
         spinner.getSelectedItem();
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -40,7 +44,10 @@ public class AlarmActivity extends AppCompatActivity {
                 if(parent.getSelectedItem().toString() != null)
                 {
                     try {
-                        editor.putInt("alarmValue", Integer.parseInt(parent.getSelectedItem().toString()));
+                        String selection = parent.getSelectedItem().toString();
+                        int hours = Integer.parseInt(selection.replaceAll("[\\D]", ""));
+                        editor.putInt("alarmValue",hours);
+                        editor.putInt("idAlarm",position);
                         editor.apply();
                     }
                     catch (Exception e){
@@ -57,6 +64,7 @@ public class AlarmActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+
                 SharedPreferences pref = getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putInt("alarmValue",86400000);
