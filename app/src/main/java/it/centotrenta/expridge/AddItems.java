@@ -12,7 +12,6 @@ import android.widget.EditText;
 
 public class AddItems extends AppCompatActivity implements View.OnClickListener {
 
-    // The variables
     private EditText nameInput;
     private CalendarView dateInput;
     private Button button;
@@ -23,7 +22,6 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_items);
 
-        // Get a handle on the views
         dbHandler = MainActivity.dataBaseHandler;
         nameInput = (EditText) findViewById(R.id.name_input);
         dateInput = (CalendarView) findViewById(R.id.calendarView);
@@ -34,7 +32,7 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     Calendar c = Calendar.getInstance();
 
-                    c.set(year,month,dayOfMonth);
+                    c.set(year, month, dayOfMonth);
 
                     view.setDate(c.getTimeInMillis());
 
@@ -56,15 +54,9 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-
-        // Get the values
         String name = nameInput.getText().toString();
         long dateMill = dateInput.getDate();
-
-        // Change the main activity db
-        dbHandler.addItem(name,dateMill);
-
-        // Get back to the activity
+        dbHandler.addItem(name, dateMill);
         super.onBackPressed();
 
     }

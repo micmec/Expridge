@@ -14,13 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-
-/**
- ** Created by michelangelomecozzi on 02/07/17.
- ** <p>
- ** 130 si volaa!
- **/
-
 //TODO work on the images
 
 class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapterViewHolder> {

@@ -10,12 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-/**
- * Created by michelangelomecozzi on 20/07/2017.
- * <p>
- * 130 si volaa!
- */
-
 public class DBHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
@@ -46,18 +40,17 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
-    public void addItem(String name, long date){
+    public void addItem(String name, long date) {
 
         SQLiteDatabase database = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(ITEM_NAME_COLUMN,name);
-        values.put(ITEM_DATE_COLUMN,date);
+        values.put(ITEM_NAME_COLUMN, name);
+        values.put(ITEM_DATE_COLUMN, date);
         try {
             database.insert(TABLE_NAME, null, values);
             database.close();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
             database.close();
@@ -66,67 +59,67 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
-    public void deleteItem(int id){
+    public void deleteItem(int id) {
 
         SQLiteDatabase database = getWritableDatabase();
 
 
         database.execSQL("DELETE FROM " + TABLE_NAME + " WHERE "
-                        + ITEM_ID_COLUMN + " =\"" + id + "\";");
+                + ITEM_ID_COLUMN + " =\"" + id + "\";");
         //CONSIDER NOT DELETING BUT CHANGING STATUS
         database.close();
 
     }
 
-    public ArrayList<String> getNamesFromColumn(){
+    public ArrayList<String> getNamesFromColumn() {
 
         SQLiteDatabase database = getWritableDatabase();
 
 
         ArrayList<String> mList = new ArrayList<>();
 
-        Cursor cursor = database.rawQuery("SELECT " + ITEM_NAME_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN,null);
+        Cursor cursor = database.rawQuery("SELECT " + ITEM_NAME_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
         cursor.moveToFirst();
 
-        while(!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
 
 //            if(cursor.getString(cursor.getColumnIndex(ITEM_NAME_COLUMN))!=null){
 
-                mList.add(cursor.getString(cursor.getColumnIndex(ITEM_NAME_COLUMN)));
-                cursor.moveToNext();
+            mList.add(cursor.getString(cursor.getColumnIndex(ITEM_NAME_COLUMN)));
+            cursor.moveToNext();
 
-           // }
+            // }
 
         }
-            cursor.close();
-            database.close();
+        cursor.close();
+        database.close();
 
         return mList;
     }
 
-    public ArrayList<String> getDatesFromColumn(){
+    public ArrayList<String> getDatesFromColumn() {
 
         SQLiteDatabase database = getWritableDatabase();
 
         ArrayList<String> mList = new ArrayList<>();
 
-            Cursor cursor = database.rawQuery("SELECT " + ITEM_DATE_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
-            cursor.moveToFirst();
+        Cursor cursor = database.rawQuery("SELECT " + ITEM_DATE_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
+        cursor.moveToFirst();
 
-            while (!cursor.isAfterLast()) {
+        while (!cursor.isAfterLast()) {
 
-                    mList.add(toDate(cursor.getLong(cursor.getColumnIndex(ITEM_DATE_COLUMN)), "dd/MM/yyyy"));
-                    cursor.moveToNext();
+            mList.add(toDate(cursor.getLong(cursor.getColumnIndex(ITEM_DATE_COLUMN)), "dd/MM/yyyy"));
+            cursor.moveToNext();
 
-            }
-            cursor.close();
-            database.close();
+        }
+        cursor.close();
+        database.close();
 
 
         return mList;
     }
 
-    public ArrayList<Integer> getIdFromColumn(){
+    public ArrayList<Integer> getIdFromColumn() {
 
         SQLiteDatabase database = getWritableDatabase();
 
@@ -149,7 +142,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
 
-    public String toDate(long milliSeconds, String format){
+    public String toDate(long milliSeconds, String format) {
 
         SimpleDateFormat formatter = new SimpleDateFormat(format);
 
@@ -164,7 +157,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return super.getReadableDatabase();
     }
 
-    public boolean isDBNil(){
+    public boolean isDBNil() {
 
         return getNamesFromColumn().isEmpty();
 

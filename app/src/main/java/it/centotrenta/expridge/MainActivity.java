@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -16,12 +17,29 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
+
+import it.centotrenta.expridge.OcrUtils.OcrCaptureActivity;
+
 
 //TODO install notifications when an item is expiring in the next 2 days
+//TODO Automatic keyboard on add item
+//TODO Name is too big font and bold, inconsistent with typing
+//TODO Name of app to be changes
+//TODO Add item screen shows settings label
+//TODO Manual add icon is wrong, no chiave inglese
+//TODO Filter no empty text on manual add item
+//TODO General UI Improvements
+//TODO Color scheme for float buttons
+//TODO Good design = simplistic fridge with shelves?
+//TODO Apache License for Vision Library
 
 public class MainActivity extends AppCompatActivity implements ListItemsAdapter.ListItemsAdapterClickHandler {
 
-    // Our variables
+
+    private static final String TAG = "MainActivity";
+    private static final int RC_OCR_CAPTURE = 9003;
+
     public static DBHandler dataBaseHandler;
     private RecyclerView mRecyclerView;
     private static ListItemsAdapter mAdapter;
@@ -215,5 +233,28 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     }
 
+    public void photoFloatClick(View view) {
+        Intent intent = new Intent(this, OcrCaptureActivity.class);
+        startActivityForResult(intent, RC_OCR_CAPTURE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == RC_OCR_CAPTURE) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (data != null) {
+                    String text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
+                    Log.d("TEXT THAT I GOT WAS", text);
+                } else {
+                    Log.d(TAG, "No Text captured, intent data is null");
+                }
+            } else {
+                Log.d("RESULT NOT FROM CAMERA", "CODE IS " + requestCode);
+            }
+        }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 }
 

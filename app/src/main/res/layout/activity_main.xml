@@ -71,6 +71,7 @@
         android:layout_marginBottom="145dp"
         android:layout_marginRight="16dp"
         android:visibility="invisible"
+        android:onClick="photoFloatClick"
         android:src="@android:drawable/ic_menu_camera" />
 
     <TextView
