@@ -73,9 +73,6 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         FabRotClock = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_rotate);
         FabRotAnti = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_rotate_back);
 
-        SharedPreferences pref = getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
-        Toast.makeText(this,pref.getInt("alarmValue",0)+ " is the value",Toast.LENGTH_SHORT).show();
-
         // FAB
         mFab = (FloatingActionButton) findViewById(R.id.red_button);
         nFab = (FloatingActionButton) findViewById(R.id.manually_button);

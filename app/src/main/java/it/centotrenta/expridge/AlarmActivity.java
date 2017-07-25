@@ -7,14 +7,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 public class AlarmActivity extends AppCompatActivity {
 
     //TODO image selection {#link} https://stackoverflow.com/questions/3609231/how-is-it-possible-to-create-a-spinner-with-images-instead-of-text
 
     Spinner spinner;
-    TextView firstText;
     public static final String MY_PREFS_NAME = "MyPrefsFile";
 
 
