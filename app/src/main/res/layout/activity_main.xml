@@ -69,7 +69,8 @@
         android:layout_marginBottom="145dp"
         android:layout_marginRight="16dp"
         android:visibility="invisible"
-        android:src="@drawable/camera" />
+        android:src="@drawable/camera"
+        android:onClick="photoFloatClick"/>
 
     <TextView
         android:id="@+id/no_items_view"

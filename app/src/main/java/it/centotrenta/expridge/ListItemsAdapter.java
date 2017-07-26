@@ -13,12 +13,6 @@ import java.util.ArrayList;
 import it.centotrenta.expridge.Utilities.DBHandler;
 
 
-
-/**
- ** Created by michelangelomecozzi on 02/07/17.
- ** <p>
- **/
-
 //TODO work on the images
 
 public class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListAdapterViewHolder> {
