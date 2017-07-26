@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="minutes_array">
+        <item name="two_hours">2 hours</item>
+        <item name="four_hours">4 hours</item>
+        <item name="eight_hours">8 hours</item>
+        <item name="sixteen_hours">16 hours</item>
+        <item name="twentyFour_hours">24 hours</item>
+        <item name="fortyEight_hours">48 hours</item>
+    </string-array>
+</resources>
