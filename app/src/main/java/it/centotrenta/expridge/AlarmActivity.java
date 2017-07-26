@@ -62,7 +62,6 @@ public class AlarmActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
                 SharedPreferences pref = getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putInt("alarmValue",86400000);

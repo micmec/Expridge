@@ -28,25 +28,20 @@ public class DBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ( " + ITEM_ID_COLUMN
                 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME_COLUMN
                 + " TEXT, " + ITEM_DATE_COLUMN + " LONG);");
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }
 
     public void addItem(String name, long date) {
-
         SQLiteDatabase database = getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put(ITEM_NAME_COLUMN, name);
         values.put(ITEM_DATE_COLUMN, date);
@@ -57,115 +52,73 @@ public class DBHandler extends SQLiteOpenHelper {
 
             e.printStackTrace();
             database.close();
-
         }
-
         ListItemsAdapter.dateForNotification = date;
-
     }
 
     public void deleteItem(int id) {
-
         SQLiteDatabase database = getWritableDatabase();
-
-
         database.execSQL("DELETE FROM " + TABLE_NAME + " WHERE "
                 + ITEM_ID_COLUMN + " =\"" + id + "\";");
-        //CONSIDER NOT DELETING BUT CHANGING STATUS
+        //TODO CONSIDER NOT DELETING BUT CHANGING STATUS
         database.close();
-
     }
 
     public ArrayList<String> getNamesFromColumn() {
-
         SQLiteDatabase database = getReadableDatabase();
-
-
         ArrayList<String> mList = new ArrayList<>();
-
         Cursor cursor = database.rawQuery("SELECT " + ITEM_NAME_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
         cursor.moveToFirst();
-
         while (!cursor.isAfterLast()) {
-
-//            if(cursor.getString(cursor.getColumnIndex(ITEM_NAME_COLUMN))!=null){
-
             mList.add(cursor.getString(cursor.getColumnIndex(ITEM_NAME_COLUMN)));
             cursor.moveToNext();
-
-            // }
-
         }
         cursor.close();
         database.close();
-
         return mList;
     }
 
     public ArrayList<String> getDatesFromColumn() {
-
         SQLiteDatabase database = getReadableDatabase();
-
         ArrayList<String> mList = new ArrayList<>();
-
         Cursor cursor = database.rawQuery("SELECT " + ITEM_DATE_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
         cursor.moveToFirst();
-
         while (!cursor.isAfterLast()) {
-
             mList.add(toDate(cursor.getLong(cursor.getColumnIndex(ITEM_DATE_COLUMN)), "dd/MM/yyyy"));
             cursor.moveToNext();
-
         }
         cursor.close();
         database.close();
-
-
         return mList;
     }
 
     public long getSpecificDate(int id){
-
         Log.d("Eccezioneeeee",""+id);
-
         SQLiteDatabase database = getReadableDatabase();
-
         Cursor cursor= database.rawQuery("SELECT " + ITEM_DATE_COLUMN + " FROM " + TABLE_NAME + " WHERE "
                 + ITEM_ID_COLUMN + " = " + id + " ;", null);
-
         long date = cursor.getLong(cursor.getColumnIndex(ITEM_DATE_COLUMN));
-
         cursor.close();
         database.close();
-
         return date;
-
     }
 
     public int getLastId(){
-
         SQLiteDatabase database = getReadableDatabase();
-
         Cursor cursor= database.rawQuery("SELECT " + ITEM_ID_COLUMN + " FROM " + TABLE_NAME + " WHERE " + ITEM_NAME_COLUMN
                 + " IS NOT NULL" , null);
         cursor.moveToLast();
-
         int id = cursor.getInt(cursor.getColumnIndex(ITEM_ID_COLUMN));
-
         return id;
 
     }
 
 
     public ArrayList<Integer> getIdFromColumn() {
-
         SQLiteDatabase database = getWritableDatabase();
-
         ArrayList<Integer> mList = new ArrayList<>();
-
         Cursor cursor = database.rawQuery("SELECT " + ITEM_ID_COLUMN + " FROM " + TABLE_NAME + " ORDER BY " + ITEM_DATE_COLUMN, null);
         cursor.moveToFirst();
-
         while (!cursor.isAfterLast()) {
 
             mList.add(cursor.getInt(cursor.getColumnIndex(ITEM_ID_COLUMN)));
@@ -174,19 +127,14 @@ public class DBHandler extends SQLiteOpenHelper {
         }
         cursor.close();
         database.close();
-
-
         return mList;
     }
 
 
     public String toDate(long milliSeconds, String format){
-
         SimpleDateFormat formatter = new SimpleDateFormat(format);
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
-
         return formatter.format(calendar.getTime());
     }
 
@@ -196,8 +144,6 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public boolean isDBNil() {
-
         return getNamesFromColumn().isEmpty();
-
     }
 }

@@ -9,24 +9,17 @@ import android.support.v4.app.NotificationManagerCompat;
 import it.centotrenta.expridge.MainActivity;
 import it.centotrenta.expridge.R;
 
-/**
- * Created by michelangelomecozzi on 22/07/2017.
- */
-
 public class ExpridgeIntentService extends IntentService {
 
     private static final int NOTIFICATION_ID = 3;
 
     public ExpridgeIntentService() {
         super("ExpridgeIntentService");
-
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
         // TODO the getIntent part sends null
-
         Intent notifyIntent = new Intent(this, MainActivity.class);
         String itemName = intent.getStringExtra("itemName");
         String dateFormatted = intent.getStringExtra("itemDate");
@@ -43,7 +36,6 @@ public class ExpridgeIntentService extends IntentService {
     }
 
     public static int getId(){
-
         return NOTIFICATION_ID;
 
     }

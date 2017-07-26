@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     private RecyclerView mRecyclerView;
     private static ListItemsAdapter mAdapter;
     private TextView mErrorMessageView;
-    private ProgressBar mProgressBar;
     private FloatingActionButton mFab,nFab,fFab;
     private TextView mNoItems;
     private Animation FabOpen,FabClose,FabRotClock,FabRotAnti;
@@ -77,63 +76,49 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Reference to the objects in the layouts/other
         mRecyclerView = (RecyclerView) findViewById(R.id.list_activity_recyclerView);
         mErrorMessageView = (TextView) findViewById(R.id.list_activity_errorMessage);
-        mProgressBar = (ProgressBar) findViewById(R.id.list_activity_progressBar);
         mNoItems = (TextView) findViewById(R.id.no_items_view);
         dataBaseHandler = new DBHandler(this);
         arrowNoItems = (ImageView) findViewById(R.id.arrow_no_items);
 
-        // Animations
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
         FabRotClock = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_rotate);
         FabRotAnti = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_rotate_back);
 
-        // FAB
         mFab = (FloatingActionButton) findViewById(R.id.red_button);
         nFab = (FloatingActionButton) findViewById(R.id.manually_button);
         fFab = (FloatingActionButton) findViewById(R.id.photo_button);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if(isOpen){
-
                     nFab.startAnimation(FabClose);
                     fFab.startAnimation(FabClose);
                     mFab.startAnimation(FabRotAnti);
                     nFab.setClickable(false);
                     fFab.setClickable(false);
                     isOpen = false;
-
-
                 }
                 else{
-
                     nFab.startAnimation(FabOpen);
                     fFab.startAnimation(FabOpen);
                     mFab.startAnimation(FabRotClock);
                     nFab.setClickable(true);
                     fFab.setClickable(true);
                     isOpen = true;
-
                 }
-
             }
         });
 
-        // LayoutManager handling
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        // Adapter
         mAdapter = new ListItemsAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
-        // Check for the items
         noItemsMethod();
 
     }
@@ -141,43 +126,25 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     @Override
     protected void onResume() {
         super.onResume();
-
-        // We reconstruct the adapter from the new data
         mAdapter.addItem(this);
         mRecyclerView.setAdapter(mAdapter);
-
-        // Check for the items
         noItemsMethod();
 
     }
 
-    // Create the options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Use AppCompatActivity's method getMenuInflater to get a handle on the menu inflater
         MenuInflater inflater = getMenuInflater();
-
-        // Inflate it (layout and menu destination as params)
         inflater.inflate(R.menu.add_item,menu);
-
         return true;
-
     }
 
-    // When the item is selected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        // Get the item id
-        int id = item.getItemId();
-
-        if(id == R.id.add_item_menu){
+        if(item.getItemId() == R.id.add_item_menu){
             Intent intent = new Intent(this, AlarmActivity.class);
             startActivity(intent);
         }
-
-        // Safe case
         return super.onOptionsItemSelected(item);
 
     }
@@ -230,12 +197,10 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
                                 case DialogInterface.BUTTON_POSITIVE:
-                                    //Yes button clicked
                                     deletePartOfTheMethod(id);
                                     break;
 
                                 case DialogInterface.BUTTON_NEGATIVE:
-                                    //No button clicked
                                     break;
                             }
                         }
@@ -275,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     }
 
     public void deletePartOfTheMethod(int id){
-
         dataBaseHandler.deleteItem(id);
         mAdapter.loadDB();
         mRecyclerView.setAdapter(mAdapter);
@@ -284,41 +248,25 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     }
 
     public void redButtonAction(View view) {
-
-        // Action of the floating red Button
         Intent intent = new Intent(this, AddItems.class);
         startActivity(intent);
 
     }
 
     private void showItemsDataView() {
-        /* First, make sure the error is invisible */
         mErrorMessageView.setVisibility(View.INVISIBLE);
         mNoItems.setVisibility(View.INVISIBLE);
         arrowNoItems.setVisibility(View.INVISIBLE);
-        /* Then, make sure the weather data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    private void showErrorMessage() {
-        /* First, hide the currently visible data */
-        mRecyclerView.setVisibility(View.INVISIBLE);
-        /* Then, show the error */
-        mErrorMessageView.setVisibility(View.VISIBLE);
-    }
 
     private void noItemsMethod(){
-
         if(dataBaseHandler.isDBNil()){
-
             mRecyclerView.setVisibility(View.INVISIBLE);
             mNoItems.setVisibility(View.VISIBLE);
-            arrowNoItems.setVisibility(View.VISIBLE);
-
-        }
-        else{
-            showItemsDataView();
-        }
+            arrowNoItems.setVisibility(View.VISIBLE);}
+        else{ showItemsDataView(); }
 
     }
 
@@ -345,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-}
+
     public void setNotification(Context context, long time,int id, String itemName,String dateFormatted){
 
         SharedPreferences pref = getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
@@ -367,16 +315,12 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     }
 
     public void deleteNotification(Context context,int id,String itemName){
-
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent notifyIntent = new Intent(context,NotificationBroadcast.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast
                 (context,id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
-
         Toast.makeText(this,"Notification off for " + itemName, Toast.LENGTH_SHORT).show();
-
     }
-
 
 }

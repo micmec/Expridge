@@ -11,12 +11,10 @@ import android.widget.EditText;
 
 import it.centotrenta.expridge.Utilities.DBHandler;
 
-
 public class AddItems extends AppCompatActivity implements View.OnClickListener {
 
     private EditText nameInput;
     private CalendarView dateInput;
-    private Button button;
     private DBHandler dbHandler;
 
     @Override
@@ -33,23 +31,18 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     Calendar c = Calendar.getInstance();
-
                     c.set(year, month, dayOfMonth);
-
                     view.setDate(c.getTimeInMillis());
 
                 }
             }
         });
-        button = (Button) findViewById(R.id.addButton);
 
     }
 
     @Override
     protected void onResume() {
-
         super.onResume();
-
         nameInput.clearComposingText();
 
     }
@@ -60,7 +53,6 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
         long dateMill = dateInput.getDate();
         dbHandler.addItem(name, dateMill);
         super.onBackPressed();
-
     }
 
 }
