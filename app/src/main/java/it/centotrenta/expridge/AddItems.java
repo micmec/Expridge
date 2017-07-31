@@ -52,6 +52,8 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
         String name = nameInput.getText().toString();
         long dateMill = dateInput.getDate();
         dbHandler.addItem(name, dateMill);
+        MainActivity.mAdapter.addToClickList();
+        MainActivity.mAdapter.addAnimationsToItem(getApplicationContext());
         super.onBackPressed();
     }
 

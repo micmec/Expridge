@@ -31,25 +31,30 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 
 import it.centotrenta.expridge.OcrUtils.OcrCaptureActivity;
 
-
+//RICCARDO
 //TODO install notifications when an item is expiring in the next 2 days
-//TODO Automatic keyboard on add item
 //TODO Name is too big font and bold, inconsistent with typing
 //TODO Name of app to be changes
 //TODO Add item screen shows settings label
-//TODO Manual add icon is wrong, no chiave inglese
 //TODO Filter no empty text on manual add item
 //TODO General UI Improvements
 //TODO Color scheme for float buttons
 //TODO Good design = simplistic fridge with shelves?
 //TODO Apache License for Vision Library
-//TODO consider creating a dialog when setting notifications to let the user choose
-//TODO find better icons since these suck
-//TODO add more settings or fill in the space of the setting part
-//TODO BUG, moving icon for notifications
-//TODO BUG, notifications cancel each other
-//TODO dialog if he puts an item with double keyword
 //TODO make the button for adding go back and the two buttons on items go back after 5 seconds
+
+//MICHELANGELO
+//TODO BUG, notifications cancel each other
+//TODO BUG, moving icon for notifications
+//TODO add more settings or fill in the space of the setting part
+//TODO dialog if he puts an item with double keyword
+//TODO solved the multiple click issues, but we have a similar one with notifications and animations
+//TODO Add the various food images
+//TODO consider creating more icons for all the food (Big waste of time or not? questo e' il dilemma)
+//TODO BUG, if we click on "manually add" multiple times it opens two activities for adding
+//TODO BUG, animation bug, first time we animate the objects it keeps animating them all together; it does not do it the rest of the times
+//TODO check if the new way of handling the insertion of items (which fixes the bug of multiple clicks) does not do useless implementations
+
 
 public class MainActivity extends AppCompatActivity implements ListItemsAdapter.ListItemsAdapterClickHandler {
 
@@ -59,17 +64,14 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     public static DBHandler dataBaseHandler;
     private RecyclerView mRecyclerView;
-    private static ListItemsAdapter mAdapter;
+    static ListItemsAdapter mAdapter;
     private TextView mErrorMessageView;
     private FloatingActionButton mFab,nFab,fFab;
     private TextView mNoItems;
     private Animation FabOpen,FabClose,FabRotClock,FabRotAnti;
     boolean isOpen = false;
-    static boolean isOpenTwo;
-    static boolean isNotificationOn;
     public static final String MY_PREFS_NAME = "MyPrefsFile";
     private ImageView arrowNoItems;
-    static boolean isFirstOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         dataBaseHandler = new DBHandler(this);
         arrowNoItems = (ImageView) findViewById(R.id.arrow_no_items);
 
+        //TODO transfer this to the adapter for the animations
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
         FabRotClock = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_rotate);
@@ -116,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mAdapter = new ListItemsAdapter(this);
+        mAdapter = new ListItemsAdapter(this,getApplicationContext());
         mRecyclerView.setAdapter(mAdapter);
 
         noItemsMethod();
@@ -126,7 +129,11 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
     @Override
     protected void onResume() {
         super.onResume();
-        mAdapter.addItem(this);
+        mAdapter.loadDB();
+        for(int i = 0; i < mAdapter.itemInformationClicked.size(); i++) {
+            mAdapter.itemInformationClicked.set(i, false);
+            mAdapter.itemInformationSecondClicked.set(i,false);
+        }
         mRecyclerView.setAdapter(mAdapter);
         noItemsMethod();
 
@@ -151,42 +158,42 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     @Override
     public void onClick(final View view, final int id, final String itemInfoName, final long time,
-                        ImageView dButton, final ImageView alarmButton, final String dateFormatted) {
+                        ImageView dButton, final ImageView alarmButton, final String dateFormatted, final int position) {
 
-            if (isOpenTwo) {
+        if (mAdapter.itemInformationClicked.get(position)) {
 
-                dButton.startAnimation(FabClose);
-                alarmButton.startAnimation(FabClose);
-                isOpenTwo = false;
-                if(!isNotificationOn){
-                    alarmButton.setImageResource(R.drawable.notifications);
-                }
-                else {
-                    alarmButton.setImageResource(R.drawable.notifications_off);
-                }
-                dButton.setImageResource(R.drawable.cancel);
-                dButton.setClickable(false);
-                alarmButton.setClickable(false);
-
+            dButton.startAnimation(mAdapter.itemAnimationsClose.get(position));
+            alarmButton.startAnimation(mAdapter.itemAnimationsClose.get(position));
+            if(!mAdapter.itemNotificationClicked.get(position)){
+                alarmButton.setImageResource(R.drawable.notifications);
             }
             else {
-
-                dButton.startAnimation(FabOpen);
-                alarmButton.startAnimation(FabOpen);
-                dButton.setClickable(true);
-                alarmButton.setClickable(true);
-                isOpenTwo = true;
-                if(!isNotificationOn){
-                    alarmButton.setImageResource(R.drawable.notifications);
-                }
-                else {
-                    alarmButton.setImageResource(R.drawable.notifications_off);
-                }
-                dButton.setImageResource(R.drawable.cancel);
-
+                alarmButton.setImageResource(R.drawable.notifications_off);
             }
+            dButton.setImageResource(R.drawable.cancel);
+            dButton.setClickable(false);
+            alarmButton.setClickable(false);
+            mAdapter.itemInformationClicked.set(position,false);
 
-        if(isFirstOpen) {
+        }
+        else {
+
+            dButton.startAnimation(mAdapter.itemAnimationsOpen.get(position));
+            alarmButton.startAnimation(mAdapter.itemAnimationsOpen.get(position));
+            dButton.setClickable(true);
+            alarmButton.setClickable(true);
+            if(!mAdapter.itemNotificationClicked.get(position)){
+                alarmButton.setImageResource(R.drawable.notifications);
+            }
+            else {
+                alarmButton.setImageResource(R.drawable.notifications_off);
+            }
+            dButton.setImageResource(R.drawable.cancel);
+            mAdapter.itemInformationClicked.set(position,true);
+            mAdapter.itemInformationSecondClicked.set(position,true);
+        }
+
+        if(mAdapter.itemInformationSecondClicked.get(position)) {
 
             dButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -197,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
                                 case DialogInterface.BUTTON_POSITIVE:
-                                    deletePartOfTheMethod(id);
+                                    deletePartOfTheMethod(id,position);
                                     break;
 
                                 case DialogInterface.BUTTON_NEGATIVE:
@@ -218,30 +225,37 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
                 @Override
                 public void onClick(View v) {
 
-                    if (!isNotificationOn) {
+                    if (!mAdapter.itemNotificationClicked.get(position)) {
 
                         alarmButton.setImageResource(R.drawable.notifications_off);
                         setNotification(MainActivity.this, time, id, itemInfoName, dateFormatted);
-                        isNotificationOn = true;
+                        mAdapter.itemNotificationClicked.set(position,true);
+
 
                     } else {
 
                         alarmButton.setImageResource(R.drawable.notifications);
                         deleteNotification(MainActivity.this, id, itemInfoName);
-                        isNotificationOn = false;
+                        mAdapter.itemNotificationClicked.set(position,false);
 
                     }
 
 
                 }
             });
-            isFirstOpen = false;
+            mAdapter.itemInformationSecondClicked.set(position,false);
         }
     }
 
-    public void deletePartOfTheMethod(int id){
+    public void deletePartOfTheMethod(int id,int position){
         dataBaseHandler.deleteItem(id);
+        mAdapter.itemInformationClicked.remove(position);
+        mAdapter.itemInformationSecondClicked.remove(position);
         mAdapter.loadDB();
+        for(int i = 0; i < mAdapter.itemInformationClicked.size(); i++) {
+            mAdapter.itemInformationClicked.set(i, false);
+            mAdapter.itemInformationSecondClicked.set(i,false);
+        }
         mRecyclerView.setAdapter(mAdapter);
         noItemsMethod();
 

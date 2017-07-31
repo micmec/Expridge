@@ -16,11 +16,12 @@ import it.centotrenta.expridge.ListItemsAdapter;
 public class DBHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "dataBase.db";
+    private static final String DATABASE_NAME = "datbas.db";
     private static final String TABLE_NAME = "itemsTable";
     private static final String ITEM_ID_COLUMN = "ID";
     private static final String ITEM_NAME_COLUMN = "Items";
     private static final String ITEM_DATE_COLUMN = "Dates";
+    private static final String ITEM_NOTIFICATION_COLUMN = "Notification";
 
     public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,7 +31,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ( " + ITEM_ID_COLUMN
                 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME_COLUMN
-                + " TEXT, " + ITEM_DATE_COLUMN + " LONG);");
+                + " TEXT, " + ITEM_DATE_COLUMN + " LONG, " + ITEM_NOTIFICATION_COLUMN + " BOOLEAN);");
     }
 
     @Override
@@ -45,6 +46,7 @@ public class DBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(ITEM_NAME_COLUMN, name);
         values.put(ITEM_DATE_COLUMN, date);
+        values.put(ITEM_NOTIFICATION_COLUMN,false);
         try {
             database.insert(TABLE_NAME, null, values);
             database.close();
@@ -122,6 +124,24 @@ public class DBHandler extends SQLiteOpenHelper {
         while (!cursor.isAfterLast()) {
 
             mList.add(cursor.getInt(cursor.getColumnIndex(ITEM_ID_COLUMN)));
+            cursor.moveToNext();
+
+        }
+        cursor.close();
+        database.close();
+        return mList;
+    }
+
+    public ArrayList<Boolean> getNotificationFromColumn() {
+        SQLiteDatabase database = getWritableDatabase();
+        ArrayList<Boolean> mList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT " + ITEM_NOTIFICATION_COLUMN + " FROM " + TABLE_NAME + " ORDER BY "
+                + ITEM_DATE_COLUMN, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+
+            Log.d("DATABASEEEE_BITCH",cursor.getString(cursor.getColumnIndex(ITEM_NOTIFICATION_COLUMN)));
+            mList.add(Boolean.valueOf(cursor.getString(cursor.getColumnIndex(ITEM_NOTIFICATION_COLUMN))));
             cursor.moveToNext();
 
         }

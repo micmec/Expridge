@@ -11,7 +11,7 @@ import it.centotrenta.expridge.R;
 
 public class ExpridgeIntentService extends IntentService {
 
-    private static final int NOTIFICATION_ID = 3;
+    private static int NOTIFICATION_ID = 0;
 
     public ExpridgeIntentService() {
         super("ExpridgeIntentService");
@@ -33,6 +33,7 @@ public class ExpridgeIntentService extends IntentService {
         Notification notificationCompat = notification.build();
         NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
         managerCompat.notify(NOTIFICATION_ID, notificationCompat);
+        NOTIFICATION_ID++;
     }
 
     public static int getId(){
