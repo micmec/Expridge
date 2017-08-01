@@ -291,19 +291,10 @@ public class MainActivity extends AppCompatActivity implements ListItemsAdapter.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == RC_OCR_CAPTURE) {
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-                    String text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
-                    Log.d("TEXT THAT I GOT WAS", text);
-                } else {
-                    Log.d(TAG, "No Text captured, intent data is null");
-                }
-            } else {
-                Log.d("RESULT NOT FROM CAMERA", "CODE IS " + requestCode);
-            }
-        }
-        else {
+        if(requestCode == RC_OCR_CAPTURE && resultCode == CommonStatusCodes.SUCCESS && data != null) {
+            String text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
+            Log.d("TEXT THAT I GOT WAS", text);
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
