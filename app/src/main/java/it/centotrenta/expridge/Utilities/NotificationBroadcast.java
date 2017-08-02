@@ -14,7 +14,7 @@ public class NotificationBroadcast extends BroadcastReceiver {
         Intent intent1 = new Intent(context,ExpridgeIntentService.class);
         intent1.putExtra("itemName",name);
         intent1.putExtra("itemDate",date);
-        ser
+        context.startService(intent1);
     }
 
 }
