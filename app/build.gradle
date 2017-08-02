@@ -36,3 +36,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-vision:11.0.2'
     testCompile 'junit:junit:4.12'
 }
+repositories {
+    mavenCentral()
+}

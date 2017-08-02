@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
+import android.view.Window;
 import android.widget.CalendarView;
 import android.widget.EditText;
 
@@ -17,9 +17,12 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
     private CalendarView dateInput;
     private DBHandler dbHandler;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_add_items);
 
         dbHandler = MainActivity.dataBaseHandler;
@@ -37,13 +40,6 @@ public class AddItems extends AppCompatActivity implements View.OnClickListener 
                 }
             }
         });
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        nameInput.clearComposingText();
 
     }
 

@@ -8,9 +8,13 @@ public class NotificationBroadcast extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //TODO send the two parameters for the notification
-        Intent intent1 = new Intent(context,ExpridgeIntentService.class);
-        context.startService(intent1);
 
+        String name = intent.getStringExtra("itemName");
+        String date = intent.getStringExtra("itemDate");
+        Intent intent1 = new Intent(context,ExpridgeIntentService.class);
+        intent1.putExtra("itemName",name);
+        intent1.putExtra("itemDate",date);
+        ser
     }
+
 }
