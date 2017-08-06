@@ -55,7 +55,7 @@ public class DBHandler extends SQLiteOpenHelper {
             e.printStackTrace();
             database.close();
         }
-        ListItemsAdapter.dateForNotification = date;
+        ListItemsAdapter.Companion.setDateForNotification(date);
     }
 
     public void deleteItem(int id) {

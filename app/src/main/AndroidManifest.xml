@@ -23,8 +23,9 @@
 
         <activity
             android:name=".AddItems"
-            android:theme="@style/Theme.AppCompat.Dialog"
-            android:label="Add an item">
+            android:label="Add An item"
+            android:windowSoftInputMode="stateVisible"
+            android:theme="@style/Theme.AppCompat.Dialog">
         </activity>
 
         <activity
@@ -50,7 +51,10 @@
             android:exported="false" />
 
         <activity
-            android:name=".AlarmActivity" />
+            android:name=".AlarmActivity"
+            android:label="Preferences"
+            android:theme="@style/Theme.AppCompat.Dialog"/>
+
     </application>
 
 </manifest>

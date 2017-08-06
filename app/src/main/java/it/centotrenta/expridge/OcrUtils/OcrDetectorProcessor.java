@@ -5,6 +5,9 @@ import android.util.SparseArray;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
 
     private GraphicOverlay<OcrGraphic> mGraphicOverlay;
@@ -28,4 +31,5 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
     public void release() {
         mGraphicOverlay.clear();
     }
+
 }
