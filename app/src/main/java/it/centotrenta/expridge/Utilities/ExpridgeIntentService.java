@@ -11,8 +11,6 @@ import it.centotrenta.expridge.R;
 
 public class ExpridgeIntentService extends IntentService {
 
-    private static int NOTIFICATION_ID = 0;
-
     public ExpridgeIntentService() {
         super("ExpridgeIntentService");
     }
@@ -23,6 +21,7 @@ public class ExpridgeIntentService extends IntentService {
         Intent notifyIntent = new Intent(this, MainActivity.class);
         String itemName = intent.getStringExtra("itemName");
         String dateFormatted = intent.getStringExtra("itemDate");
+        int id = intent.getIntExtra("id",0);
         Notification.Builder notification = new Notification.Builder(this);
         notification.setContentTitle(itemName + " will expire soon!");
         notification.setContentText("You should eat it before " + dateFormatted);
@@ -32,13 +31,7 @@ public class ExpridgeIntentService extends IntentService {
         notification.setContentIntent(pendingIntent);
         Notification notificationCompat = notification.build();
         NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
-        managerCompat.notify(NOTIFICATION_ID, notificationCompat);
-        NOTIFICATION_ID++;
-    }
-
-    public static int getId(){
-        return NOTIFICATION_ID;
-
+        managerCompat.notify(id, notificationCompat);
     }
 
 }

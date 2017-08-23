@@ -34,20 +34,20 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/red_button"
-        android:backgroundTint="@color/colorAccent"
-        android:elevation="6dp"
+        app:backgroundTint="@color/colorAccent"
+        app:elevation="6dp"
         app:srcCompat="@drawable/ic_add_black_24dp"
         android:layout_marginBottom="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         app:pressedTranslationZ="12dp"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginEnd="16dp"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/manually_button"
-        android:backgroundTint="@color/colorAccent"
-        android:elevation="6dp"
+        app:backgroundTint="@color/colorAccent"
+        app:elevation="6dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -60,14 +60,14 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/photo_button"
-        android:backgroundTint="@color/colorAccent"
-        android:elevation="6dp"
+        app:backgroundTint="@color/colorAccent"
+        app:elevation="6dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         app:pressedTranslationZ="12dp"
         android:layout_marginBottom="145dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         android:visibility="invisible"
         android:src="@drawable/camera"
         android:onClick="photoFloatClick"/>

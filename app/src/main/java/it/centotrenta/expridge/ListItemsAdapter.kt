@@ -20,30 +20,28 @@ import java.util.ArrayList
  */
 class ListItemsAdapter constructor(clickHandler: ListItemsAdapterClickHandler, context: Context) : RecyclerView.Adapter<ListItemsAdapter.ListAdapterViewHolder>() {
 
-    companion object {
-        var dateForNotification: Long = 0
-    }
-
     var listClickHandler: ListItemsAdapterClickHandler = clickHandler
     var itemInformationName: ArrayList<String>? = null
-    private var itemInformationDate: ArrayList<String>? = null
+    var itemInformationDate: ArrayList<String>? = null
+    var itemInformationDateForNotification: ArrayList<Long>? = null
     private var itemInformationImage: ArrayList<Int>? = null
-    private var itemInformationId: ArrayList<Int>? = null
+    var itemInformationId: ArrayList<Int>? = null
     var itemInformationClicked = ArrayList<Boolean>()
     var itemInformationSecondClicked = ArrayList<Boolean>()
     internal var itemNotificationClicked: ArrayList<Boolean>
     var itemAnimationsOpen = ArrayList<Animation>()
     var itemAnimationsClose = ArrayList<Animation>()
-    private var databaseHandler: DBHandler = MainActivity.dataBaseHandler
+    var databaseHandler: DBHandler = MainActivity.dataBaseHandler
 
     interface ListItemsAdapterClickHandler {
-        fun onClick(view: View, id: Int, itemInfoName: String, time: Long, deleteButton: ImageView, alarmButton: ImageView,
+        fun onClick(view: View, id: Int, itemInfoName: String, time: Long, deleteButton: ImageView, alarmButton: ImageView, dateView: TextView,
                     dateFormatted: String, pos: Int)
     }
 
     init {
         itemInformationName = databaseHandler.namesFromColumn
         itemInformationDate = databaseHandler.datesFromColumn
+        itemInformationDateForNotification = databaseHandler.datesLongFromColumn
         itemInformationImage = getRelativeImages(itemInformationName)
         itemInformationId = databaseHandler.idFromColumn
         itemNotificationClicked = databaseHandler.notificationFromColumn
@@ -56,8 +54,8 @@ class ListItemsAdapter constructor(clickHandler: ListItemsAdapterClickHandler, c
         for (i in itemInformationName!!.indices) {
             itemInformationClicked.add(false)
             itemInformationSecondClicked.add(false)
-            itemAnimationsOpen.add(AnimationUtils.loadAnimation(context, R.anim.fab_open))
-            itemAnimationsClose.add(AnimationUtils.loadAnimation(context, R.anim.fab_close))
+            itemAnimationsOpen.add(AnimationUtils.loadAnimation(context, R.anim.opening_animation))
+            itemAnimationsClose.add(AnimationUtils.loadAnimation(context, R.anim.closing_animation))
         }
     }
 
@@ -82,11 +80,12 @@ class ListItemsAdapter constructor(clickHandler: ListItemsAdapterClickHandler, c
         override fun onClick(v: View) {
 
             val adapterPosition = adapterPosition
+            val dateForNotification = itemInformationDateForNotification!![adapterPosition]
             val itemName = itemInformationName!![adapterPosition]
             val dateFormatted = itemInformationDate!![adapterPosition]
             val id = itemInformationId!![adapterPosition]
             val pos = itemInformationId!!.indexOf(id)
-            listClickHandler.onClick(v, id, itemName, dateForNotification, deleteButton, alarmButton, dateFormatted, pos)
+            listClickHandler.onClick(v, id, itemName, dateForNotification, deleteButton, alarmButton, listItemDate,dateFormatted, pos)
 
         }
 
@@ -187,6 +186,7 @@ class ListItemsAdapter constructor(clickHandler: ListItemsAdapterClickHandler, c
     internal fun loadDB() {
         itemInformationName = databaseHandler.namesFromColumn
         itemInformationDate = databaseHandler.datesFromColumn
+        itemInformationDateForNotification = databaseHandler.datesLongFromColumn
         itemInformationImage = getRelativeImages(itemInformationName)
         itemInformationId = databaseHandler.idFromColumn
         itemNotificationClicked = databaseHandler.notificationFromColumn

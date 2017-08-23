@@ -117,4 +117,11 @@
     <string name="ocr_error">"Error reading text: %1$s"</string>
     <string name="name_hint">Name</string>
 
+    <!-- Preferences -->
+
+    <!-- Hours Input -->
+    <string name="pref_hours_input_key" translatable="false">hours_input</string>
+    <string name="pref_hours_input_default" translatable="false">24</string>
+    <string name="pref_hours_input_label">Hours before the expiry for alarm</string>
+
 </resources>

@@ -1,62 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<fragment
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:name="it.centotrenta.expridge.SettingsFragmentClass"
+    android:id="@+id/settings_fragment"
     android:layout_height="match_parent"
-    android:id="@+id/alarm_activity"
-    tools:context="it.centotrenta.expridge.AlarmActivity">
-
-
-    <LinearLayout
-        android:id="@+id/linear_one"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="I want to be notified"
-            android:layout_marginStart="16dp"
-            android:layout_weight="6"
-            android:textSize="18sp"
-            android:padding="5dp"
-            android:layout_marginTop="20dp"
-            android:textColor="#000"/>
-
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="20dp"
-            />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="before."
-            android:layout_weight="3"
-            android:textSize="18sp"
-            android:padding="5dp"
-            android:layout_marginTop="20dp"
-            android:textColor="#000" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linear_two"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-
-        <ImageSwitcher
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        </ImageSwitcher>
-    </LinearLayout>
-
-
-</LinearLayout>
+    android:layout_width="match_parent" />

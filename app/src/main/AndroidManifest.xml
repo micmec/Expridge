@@ -8,14 +8,15 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/icon_expridge"
+        android:icon="@drawable/expridgeicon"
+        android:roundIcon="@drawable/expridgeicon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
         <activity
             android:name=".MainActivity"
-            android:label="Your food">
-            <intent-filter>
+            android:launchMode="singleTop">
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -52,8 +53,7 @@
 
         <activity
             android:name=".AlarmActivity"
-            android:label="Preferences"
-            android:theme="@style/Theme.AppCompat.Dialog"/>
+            android:label="Preferences"/>
 
     </application>
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_hours_input_default"
+        android:inputType="number"
+        android:key="@string/pref_hours_input_key"
+        android:singleLine="true"
+        android:title="@string/pref_hours_input_label" />
+
+</PreferenceScreen>

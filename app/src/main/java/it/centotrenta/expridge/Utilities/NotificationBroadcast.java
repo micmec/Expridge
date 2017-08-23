@@ -11,9 +11,11 @@ public class NotificationBroadcast extends BroadcastReceiver {
 
         String name = intent.getStringExtra("itemName");
         String date = intent.getStringExtra("itemDate");
+        int id = intent.getIntExtra("id",0);
         Intent intent1 = new Intent(context,ExpridgeIntentService.class);
         intent1.putExtra("itemName",name);
         intent1.putExtra("itemDate",date);
+        intent1.putExtra("id",id);
         context.startService(intent1);
     }
 
