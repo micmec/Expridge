@@ -45,7 +45,7 @@ public class DBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(ITEM_NAME_COLUMN, name);
         values.put(ITEM_DATE_COLUMN, date);
-        values.put(ITEM_NOTIFICATION_COLUMN,false);
+        values.put(ITEM_NOTIFICATION_COLUMN,true);
         try {
             database.insert(TABLE_NAME, null, values);
             database.close();
@@ -139,7 +139,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return mList;
     }
 
-    public String toDate(long milliSeconds, String format){
+    private String toDate(long milliSeconds, String format){
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);

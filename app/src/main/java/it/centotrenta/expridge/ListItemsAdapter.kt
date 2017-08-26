@@ -13,11 +13,6 @@ import android.widget.TextView
 import it.centotrenta.expridge.Utilities.DBHandler
 import java.util.ArrayList
 
-/**
- * Created by michelangelomecozzi on 05/08/2017.
- *
- * 130 si volaa!
- */
 class ListItemsAdapter constructor(clickHandler: ListItemsAdapterClickHandler, context: Context) : RecyclerView.Adapter<ListItemsAdapter.ListAdapterViewHolder>() {
 
     var listClickHandler: ListItemsAdapterClickHandler = clickHandler

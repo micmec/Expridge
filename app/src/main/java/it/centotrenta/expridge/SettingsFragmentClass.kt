@@ -27,13 +27,13 @@ class SettingsFragmentClass: PreferenceFragmentCompat(), SharedPreferences.OnSha
             val p = prefScreen.getPreference(i)
             if (p !is CheckBoxPreference) {
                 val value = sharedPreferences.getString(p.key, "")
-                p.summary = value
+                p.summary = value + " hours before"
             }
         }
 
         val preference = findPreference(getString(R.string.pref_hours_input_key))
         preference!!.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
-            val error = Toast.makeText(context, "Please select a number for the hours", Toast.LENGTH_SHORT)
+            val error = Toast.makeText(context, "Please select an integer", Toast.LENGTH_SHORT)
 
             // Double check that the preference is the size preference
             val sizeKey = getString(R.string.pref_hours_input_key)
@@ -72,36 +72,10 @@ class SettingsFragmentClass: PreferenceFragmentCompat(), SharedPreferences.OnSha
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         val preference = findPreference(key)
-        Log.d("PREFERENCE WAS CHANGED","PREFERENCE WAS CHANGED 2")
         if (null != preference) {
             if (preference !is CheckBoxPreference) {
-                preference.summary = sharedPreferences.getString(key, "")
+                preference.summary = sharedPreferences.getString(key, "null") + " hours before"
             }
         }
     }
-
-//    override fun onPreferenceChange(preference: android.preference.Preference?, newValue: Any?): Boolean {
-//        val error = Toast.makeText(context, "Please select a number for the hours", Toast.LENGTH_SHORT)
-//
-//        Log.d("PREFERENCE WAS CHANGED","PREFERENCE WAS CHANGED")
-//        // Double check that the preference is the size preference
-//        val sizeKey = getString(R.string.pref_hours_input_key)
-//        if (preference!!.key == sizeKey) {
-//            try {
-//                val stringSize = Integer.parseInt(newValue as String)
-//                // If the number is outside of the acceptable range, show an error.
-//                if (stringSize <= 0 || stringSize>100) {
-//                    error.show()
-//                    return false
-//                }
-//            } catch (nfe: NumberFormatException) {
-//                // If whatever the user entered can't be parsed to a number, show an error
-//                error.show()
-//                return false
-//            }
-//
-//        }
-//        return true
-//    }
-
 }

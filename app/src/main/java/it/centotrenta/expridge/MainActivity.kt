@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
-import android.preference.Preference
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AlertDialog
@@ -29,12 +28,6 @@ import it.centotrenta.expridge.OcrUtils.OcrCaptureActivity
 import it.centotrenta.expridge.Utilities.DBHandler
 import it.centotrenta.expridge.Utilities.NotificationBroadcast
 
-/**
- * Created by michelangelomecozzi on 04/08/2017.
- *
- * 130 si volaa!
- */
-
 //RICCARDO
 //TODO install notifications when an item is expiring in the next 2 days
 //TODO Name is too big font and bold, inconsistent with typing
@@ -53,9 +46,6 @@ import it.centotrenta.expridge.Utilities.NotificationBroadcast
 //TODO add more settings or fill in the space of the setting part
 //TODO dialog if he puts an item with double keyword
 //TODO BUG, if we click on "manually add" multiple times it opens two activities for adding
-//TODO BUG, animation bug, first time we animate the objects it keeps animating them all together; it does not do it the rest of the times
-//TODO check if the new way of handling the insertion of items (which fixes the bug of multiple clicks) does not do useless implementations
-//TODO create a protection from SQL injection attacks
 
 class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClickHandler,SharedPreferences.OnSharedPreferenceChangeListener{
 
@@ -79,7 +69,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
     private var FabRotClock: Animation? = null
     private var FabRotAnti: Animation? = null
     private var isOpen = false
-    var notificationPreferenceTime: Int = 0
+    private var notificationPreferenceTime: Int = 0
     private var arrowNoItems: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,15 +91,11 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         nFab = findViewById(R.id.manually_button) as FloatingActionButton
         fFab = findViewById(R.id.photo_button) as FloatingActionButton
         mFab!!.setOnClickListener({
-            if (isOpen) {
-                fabOff()
-            } else {
-                fabOn()
-            }
+            if (isOpen) fabOff()
+            else fabOn()
         })
 
-        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        mRecyclerView!!.layoutManager = layoutManager
+        mRecyclerView!!.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         mRecyclerView!!.setHasFixedSize(true)
 
         mAdapter = ListItemsAdapter(this, applicationContext)
@@ -117,8 +103,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
 
         font = Typeface.createFromAsset(assets,"Roboto-Regular.ttf")
 
-        android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(this)
+        android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this)
 
         noItemsMethod()
     }
@@ -147,12 +132,15 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
             mAdapter.itemNotificationClicked
                     .filter { it }
                     .forEach {
-                        deleteNotification(this, mAdapter.itemInformationId!![mAdapter.itemInformationClicked.indexOf(it)], //TODO
-                                mAdapter.itemInformationName!![mAdapter.itemInformationClicked.indexOf(it)])
-                        setNotification(this,mAdapter.itemInformationDateForNotification!![mAdapter.itemInformationClicked.indexOf(it)],
-                                mAdapter.itemInformationId!![mAdapter.itemInformationClicked.indexOf(it)],
-                                mAdapter.itemInformationName!![mAdapter.itemInformationClicked.indexOf(it)],
-                                mAdapter.itemInformationDate!![mAdapter.itemInformationClicked.indexOf(it)])
+                        if(it) {
+                            deleteNotification(this, mAdapter.itemInformationId!![mAdapter.itemNotificationClicked.indexOf(it)],
+                                    mAdapter.itemInformationName!![mAdapter.itemNotificationClicked.indexOf(it)])
+
+                            setNotification(this, mAdapter.itemInformationDateForNotification!![mAdapter.itemNotificationClicked.indexOf(it)],
+                                    mAdapter.itemInformationId!![mAdapter.itemNotificationClicked.indexOf(it)],
+                                    mAdapter.itemInformationName!![mAdapter.itemNotificationClicked.indexOf(it)],
+                                    mAdapter.itemInformationDate!![mAdapter.itemNotificationClicked.indexOf(it)])
+                        }
                     }
             PREFERENCES_HAVE_BEEN_UPDATED = false
         }
@@ -214,6 +202,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
 
                     alarmButton.setImageResource(R.drawable.notifications_off)
                     setNotification(this, time, id, itemInfoName, dateFormatted)
+                    Toast.makeText(this, "Notification on for " + itemInfoName, Toast.LENGTH_SHORT).show()
                     mAdapter.itemNotificationClicked[pos] = true
                     mAdapter.databaseHandler.changeNotificationStatus(id,mAdapter.itemNotificationClicked[pos])
 
@@ -231,7 +220,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         }
     }
 
-    fun deletePartOfTheMethod(id: Int, position: Int,itemName: String) {
+    private fun deletePartOfTheMethod(id: Int, position: Int, itemName: String) {
         dataBaseHandler.deleteItem(id)
         mAdapter.itemInformationClicked.removeAt(position)
         mAdapter.itemInformationSecondClicked.removeAt(position)
@@ -269,8 +258,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
     }
 
     fun photoFloatClick(view: View) {
-        val intent = Intent(this, OcrCaptureActivity::class.java)
-        startActivityForResult(intent, RC_OCR_CAPTURE)
+        startActivityForResult(Intent(this, OcrCaptureActivity::class.java), RC_OCR_CAPTURE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -282,7 +270,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         }
     }
 
-    fun setNotification(context: Context, time: Long, id: Int, itemName: String, dateFormatted: String) {
+    private fun setNotification(context: Context, time: Long, id: Int, itemName: String, dateFormatted: String) {
 
         val howBefore = notificationPreferenceTime
 
@@ -293,21 +281,18 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         val pendingIntent = PendingIntent.getBroadcast(context, id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.set(AlarmManager.RTC_WAKEUP, time - howBefore, pendingIntent)
-
-        Toast.makeText(this, "Notification on for " + itemName, Toast.LENGTH_SHORT).show()
-
         //TODO bug, create an if statement for avoiding notifications in cases of selecting the same day or the next one
 
     }
 
-    fun deleteNotification(context: Context, id: Int, itemName: String) {
+    private fun deleteNotification(context: Context, id: Int, itemName: String) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notifyIntent = Intent(context, NotificationBroadcast::class.java)
         val pendingIntent = PendingIntent.getBroadcast(context, id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.cancel(pendingIntent)
     }
 
-    fun openingAnimation(deleteButton: ImageView,alarmButton: ImageView,dateView: TextView,pos: Int){
+    private fun openingAnimation(deleteButton: ImageView, alarmButton: ImageView, dateView: TextView, pos: Int){
 
         deleteButton.startAnimation(mAdapter.itemAnimationsOpen[pos])
         alarmButton.startAnimation(mAdapter.itemAnimationsOpen[pos])
@@ -324,7 +309,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         mAdapter.itemInformationSecondClicked[pos] = true
     }
 
-    fun closingAnimation(deleteButton: ImageView,alarmButton: ImageView,dateView: TextView,pos: Int){
+    private fun closingAnimation(deleteButton: ImageView, alarmButton: ImageView, dateView: TextView, pos: Int){
 
         deleteButton.startAnimation(mAdapter.itemAnimationsClose[pos])
         alarmButton.startAnimation(mAdapter.itemAnimationsClose[pos])
@@ -340,7 +325,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         mAdapter.itemInformationClicked[pos] = false
     }
 
-    fun setOtherViewsOff(){
+    private fun setOtherViewsOff(){
 
         for(i in mAdapter.itemInformationName!!.indices){
 
@@ -355,7 +340,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         }
     }
 
-    fun fabOn(){
+    private fun fabOn(){
         nFab!!.startAnimation(FabOpen)
         fFab!!.startAnimation(FabOpen)
         mFab!!.startAnimation(FabRotClock)
@@ -364,7 +349,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         isOpen = true
     }
 
-    fun fabOff(){
+    private fun fabOff(){
         nFab!!.startAnimation(FabClose)
         fFab!!.startAnimation(FabClose)
         mFab!!.startAnimation(FabRotAnti)

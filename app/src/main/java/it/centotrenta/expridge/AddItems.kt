@@ -1,6 +1,5 @@
 package it.centotrenta.expridge
 
-import android.content.DialogInterface
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -10,11 +9,6 @@ import android.widget.CalendarView
 import android.widget.EditText
 import it.centotrenta.expridge.Utilities.DBHandler
 
-/**
- * Created by michelangelomecozzi on 05/08/2017.
- *
- * 130 si volaa!
- */
 class AddItems : AppCompatActivity() ,View.OnClickListener{
 
     private var nameInput: EditText? = null

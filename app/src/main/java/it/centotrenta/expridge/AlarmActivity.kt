@@ -12,10 +12,6 @@ import android.widget.EditText
  */
 class AlarmActivity : AppCompatActivity(){
 
-    companion object {
-        val MY_PREFS_NAME = "MyPrefsFile"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
