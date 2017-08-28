@@ -25,7 +25,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.common.api.CommonStatusCodes
 import it.centotrenta.expridge.OcrUtils.OcrCaptureActivity
-import it.centotrenta.expridge.Utilities.DBHandler
 import it.centotrenta.expridge.Utilities.NotificationBroadcast
 
 //RICCARDO
@@ -47,17 +46,20 @@ import it.centotrenta.expridge.Utilities.NotificationBroadcast
 //TODO dialog if he puts an item with double keyword
 //TODO BUG, if we click on "manually add" multiple times it opens two activities for adding
 
-class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClickHandler,SharedPreferences.OnSharedPreferenceChangeListener{
+class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClickHandler, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val RC_OCR_CAPTURE = 9003
 
     companion object {
-        lateinit var dataBaseHandler: DBHandler
         lateinit var mAdapter: ListItemsAdapter
         lateinit var font: Typeface
         private var PREFERENCES_HAVE_BEEN_UPDATED = false
 
+        fun updateTest() = mAdapter.notifyDataSetChanged()
+
     }
+
+
     private var mRecyclerView: RecyclerView? = null
     private var mErrorMessageView: TextView? = null
     private var mFab: FloatingActionButton? = null
@@ -79,7 +81,6 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         mRecyclerView = findViewById(R.id.list_activity_recyclerView) as RecyclerView
         mErrorMessageView = findViewById(R.id.list_activity_errorMessage) as TextView
         mNoItems = findViewById(R.id.no_items_view) as TextView
-        dataBaseHandler = DBHandler(this)
         arrowNoItems = findViewById(R.id.arrow_no_items) as ImageView
 
         FabOpen = AnimationUtils.loadAnimation(applicationContext, R.anim.fab_open)
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         mAdapter = ListItemsAdapter(this, applicationContext)
         mRecyclerView!!.adapter = mAdapter
 
-        font = Typeface.createFromAsset(assets,"Roboto-Regular.ttf")
+        font = Typeface.createFromAsset(assets, "Roboto-Regular.ttf")
 
         android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this)
 
@@ -112,11 +113,11 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
 
         super.onResume()
 
-        mAdapter.loadDB()
+        //mAdapter.loadDB() TODO fetching
 
-        for (i in mAdapter.itemInformationClicked.indices) {
-            mAdapter.itemInformationClicked[i] = false
-            mAdapter.itemInformationSecondClicked[i] = false
+        for (i in mAdapter.rowItems.indices) {
+            mAdapter.rowItems[i].firstClick = false
+            mAdapter.rowItems[i].secondClick = false
         }
         mRecyclerView!!.adapter = mAdapter
 
@@ -126,37 +127,23 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
     override fun onStart() {
         super.onStart()
         if (PREFERENCES_HAVE_BEEN_UPDATED) {
-            notificationPreferenceTime = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_hours_input_key),
-                    "24")) * 1000 * 60 * 60
+            notificationPreferenceTime = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_hours_input_key), "24")) * 1000 * 60 * 60
 
-            mAdapter.itemNotificationClicked
-                    .filter { it }
-                    .forEach {
-                        if(it) {
-                            deleteNotification(this, mAdapter.itemInformationId!![mAdapter.itemNotificationClicked.indexOf(it)],
-                                    mAdapter.itemInformationName!![mAdapter.itemNotificationClicked.indexOf(it)])
-
-                            setNotification(this, mAdapter.itemInformationDateForNotification!![mAdapter.itemNotificationClicked.indexOf(it)],
-                                    mAdapter.itemInformationId!![mAdapter.itemNotificationClicked.indexOf(it)],
-                                    mAdapter.itemInformationName!![mAdapter.itemNotificationClicked.indexOf(it)],
-                                    mAdapter.itemInformationDate!![mAdapter.itemNotificationClicked.indexOf(it)])
-                        }
-                    }
+            mAdapter.rowItems.filter { it -> it.item.notificationStatus }.forEach {
+                deleteNotification(this, it.item.id.toInt())
+                setNotification(this, it.item.date, it.item.id.toInt(), it.item.name, it.dateFormatted)
+            }
             PREFERENCES_HAVE_BEEN_UPDATED = false
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this)
+        android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-
-        val inflater = menuInflater
-        inflater.inflate(R.menu.add_item, menu)
+        menuInflater.inflate(R.menu.add_item, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -171,23 +158,23 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
     override fun onClick(view: View, id: Int, itemInfoName: String, time: Long,
                          deleteButton: ImageView, alarmButton: ImageView, dateView: TextView, dateFormatted: String, pos: Int) {
 
-        if (mAdapter.itemInformationClicked[pos]) {
+        if (mAdapter.rowItems[pos].firstClick) {
 
-            closingAnimation(deleteButton,alarmButton,dateView,pos)
+            closingAnimation(deleteButton, alarmButton, dateView, pos)
 
         } else {
 
             setOtherViewsOff()
-            openingAnimation(deleteButton,alarmButton,dateView,pos)
+            openingAnimation(deleteButton, alarmButton, dateView, pos)
 
         }
 
-        if (mAdapter.itemInformationSecondClicked[pos]) {
+        if (mAdapter.rowItems[pos].secondClick) {
 
             deleteButton.setOnClickListener { view ->
                 val dialogClickListener = DialogInterface.OnClickListener { dialog, which ->
                     when (which) {
-                        DialogInterface.BUTTON_POSITIVE -> deletePartOfTheMethod(id, pos,itemInfoName)
+                        DialogInterface.BUTTON_POSITIVE -> deletePartOfTheMethod(id, pos, itemInfoName)
 
                     }
                 }
@@ -198,43 +185,42 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
             }
 
             alarmButton.setOnClickListener {
-                if (!mAdapter.itemNotificationClicked[pos]) {
+                if (!mAdapter.rowItems[pos].item.notificationStatus) {
 
                     alarmButton.setImageResource(R.drawable.notifications_off)
                     setNotification(this, time, id, itemInfoName, dateFormatted)
                     Toast.makeText(this, "Notification on for " + itemInfoName, Toast.LENGTH_SHORT).show()
-                    mAdapter.itemNotificationClicked[pos] = true
-                    mAdapter.databaseHandler.changeNotificationStatus(id,mAdapter.itemNotificationClicked[pos])
+                    mAdapter.rowItems[pos].item.notificationStatus = true
+                    //mAdapter.databaseHandler.changeNotificationStatus(id,mAdapter.itemNotificationClicked[pos]) //TODO
 
 
                 } else {
 
                     alarmButton.setImageResource(R.drawable.notifications)
-                    deleteNotification(this, id, itemInfoName)
+                    deleteNotification(this, id)
                     Toast.makeText(this, "Notification off for " + itemInfoName, Toast.LENGTH_SHORT).show()
-                    mAdapter.itemNotificationClicked[pos] = false
-                    mAdapter.databaseHandler.changeNotificationStatus(id,mAdapter.itemNotificationClicked[pos])
+                    mAdapter.rowItems[pos].item.notificationStatus = false
+                    //mAdapter.databaseHandler.changeNotificationStatus(id,mAdapter.itemNotificationClicked[pos])
                 }
             }
-            mAdapter.itemInformationSecondClicked[pos] = false
+            mAdapter.rowItems[pos].secondClick = true
         }
     }
 
     private fun deletePartOfTheMethod(id: Int, position: Int, itemName: String) {
-        dataBaseHandler.deleteItem(id)
-        mAdapter.itemInformationClicked.removeAt(position)
-        mAdapter.itemInformationSecondClicked.removeAt(position)
-        mAdapter.loadDB()
-        for (i in mAdapter.itemInformationClicked.indices) {
-            mAdapter.itemInformationClicked[i] = false
-            mAdapter.itemInformationSecondClicked[i] = false
+        //dataBaseHandler.deleteItem(id) //TODO
+        //mAdapter.loadDB() TODO fetching
+        for (i in mAdapter.rowItems.indices) {
+            mAdapter.rowItems[i].firstClick = false
+            mAdapter.rowItems[i].secondClick = false
         }
         mRecyclerView!!.adapter = mAdapter
-        deleteNotification(this,id,itemName)
+        deleteNotification(this, id)
         noItemsMethod()
     }
 
     fun redButtonAction(view: View) {
+        var items = mAdapter.rowItems
         val intent = Intent(this, AddItems::class.java)
         startActivity(intent)
 
@@ -248,7 +234,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
     }
 
     private fun noItemsMethod() {
-        if (dataBaseHandler.isDBNil) {
+        if (true) { //TODO Change
             mRecyclerView!!.visibility = View.INVISIBLE
             mNoItems!!.visibility = View.VISIBLE
             arrowNoItems!!.visibility = View.VISIBLE
@@ -285,36 +271,36 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
 
     }
 
-    private fun deleteNotification(context: Context, id: Int, itemName: String) {
+    private fun deleteNotification(context: Context, id: Int) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notifyIntent = Intent(context, NotificationBroadcast::class.java)
         val pendingIntent = PendingIntent.getBroadcast(context, id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.cancel(pendingIntent)
     }
 
-    private fun openingAnimation(deleteButton: ImageView, alarmButton: ImageView, dateView: TextView, pos: Int){
+    private fun openingAnimation(deleteButton: ImageView, alarmButton: ImageView, dateView: TextView, pos: Int) {
 
-        deleteButton.startAnimation(mAdapter.itemAnimationsOpen[pos])
-        alarmButton.startAnimation(mAdapter.itemAnimationsOpen[pos])
-        dateView.startAnimation(mAdapter.itemAnimationsClose[pos])
+        deleteButton.startAnimation(mAdapter.rowItems[pos].animationOpen)
+        alarmButton.startAnimation(mAdapter.rowItems[pos].animationOpen)
+        dateView.startAnimation(mAdapter.rowItems[pos].animationClose)
         deleteButton.isClickable = true
         alarmButton.isClickable = true
-        if (!mAdapter.itemNotificationClicked[pos]) {
+        if (!mAdapter.rowItems[pos].item.notificationStatus) {
             alarmButton.setImageResource(R.drawable.notifications)
         } else {
             alarmButton.setImageResource(R.drawable.notifications_off)
         }
         deleteButton.setImageResource(R.drawable.cancel)
-        mAdapter.itemInformationClicked[pos] = true
-        mAdapter.itemInformationSecondClicked[pos] = true
+        mAdapter.rowItems[pos].firstClick = true
+        mAdapter.rowItems[pos].secondClick = true
     }
 
-    private fun closingAnimation(deleteButton: ImageView, alarmButton: ImageView, dateView: TextView, pos: Int){
+    private fun closingAnimation(deleteButton: ImageView, alarmButton: ImageView, dateView: TextView, pos: Int) {
 
-        deleteButton.startAnimation(mAdapter.itemAnimationsClose[pos])
-        alarmButton.startAnimation(mAdapter.itemAnimationsClose[pos])
-        dateView.startAnimation(mAdapter.itemAnimationsOpen[pos])
-        if (!mAdapter.itemNotificationClicked[pos]) {
+        deleteButton.startAnimation(mAdapter.rowItems[pos].animationClose)
+        alarmButton.startAnimation(mAdapter.rowItems[pos].animationClose)
+        dateView.startAnimation(mAdapter.rowItems[pos].animationOpen)
+        if (!mAdapter.rowItems[pos].item.notificationStatus) {
             alarmButton.setImageResource(R.drawable.notifications)
         } else {
             alarmButton.setImageResource(R.drawable.notifications_off)
@@ -322,25 +308,27 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         deleteButton.setImageResource(R.drawable.cancel)
         deleteButton.isClickable = false
         alarmButton.isClickable = false
-        mAdapter.itemInformationClicked[pos] = false
+        mAdapter.rowItems[pos].firstClick = false
+        mAdapter.rowItems[pos].secondClick = false
+
     }
 
-    private fun setOtherViewsOff(){
+    private fun setOtherViewsOff() {
 
-        for(i in mAdapter.itemInformationName!!.indices){
+        for (i in mAdapter.rowItems) {
 
-            val view = mRecyclerView!!.findViewHolderForAdapterPosition(i).itemView
+            val view = mRecyclerView!!.findViewHolderForAdapterPosition(mAdapter.rowItems.indexOf(i)).itemView
 
-            if(mAdapter.itemInformationClicked[i]) {
+            if (i.firstClick) {
                 val deleteButton: ImageView = view.findViewById(R.id.delete_button) as ImageView
                 val alarmButton: ImageView = view.findViewById(R.id.alarm_button) as ImageView
                 val dateView: TextView = view.findViewById(R.id.date_of_food) as TextView
-                closingAnimation(deleteButton,alarmButton,dateView,i)
+                closingAnimation(deleteButton, alarmButton, dateView, mAdapter.rowItems.indexOf(i))
             }
         }
     }
 
-    private fun fabOn(){
+    private fun fabOn() {
         nFab!!.startAnimation(FabOpen)
         fFab!!.startAnimation(FabOpen)
         mFab!!.startAnimation(FabRotClock)
@@ -349,7 +337,7 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
         isOpen = true
     }
 
-    private fun fabOff(){
+    private fun fabOff() {
         nFab!!.startAnimation(FabClose)
         fFab!!.startAnimation(FabClose)
         mFab!!.startAnimation(FabRotAnti)
@@ -362,4 +350,5 @@ class MainActivity : AppCompatActivity(), ListItemsAdapter.ListItemsAdapterClick
 
         PREFERENCES_HAVE_BEEN_UPDATED = true
     }
+
 }

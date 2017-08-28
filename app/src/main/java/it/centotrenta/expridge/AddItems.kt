@@ -7,13 +7,11 @@ import android.view.View
 import android.view.Window
 import android.widget.CalendarView
 import android.widget.EditText
-import it.centotrenta.expridge.Utilities.DBHandler
 
 class AddItems : AppCompatActivity() ,View.OnClickListener{
 
     private var nameInput: EditText? = null
     private var dateInput: CalendarView? = null
-    private var dbHandler: DBHandler? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +20,6 @@ class AddItems : AppCompatActivity() ,View.OnClickListener{
 
         setContentView(R.layout.activity_add_items)
 
-        dbHandler = MainActivity.dataBaseHandler
         nameInput = findViewById(R.id.name_input) as EditText
         dateInput = findViewById(R.id.calendarView) as CalendarView
         dateInput!!.setOnDateChangeListener { view, year, month, dayOfMonth ->
@@ -39,9 +36,7 @@ class AddItems : AppCompatActivity() ,View.OnClickListener{
     override fun onClick(v: View) {
         val name = nameInput!!.text.toString()
         val dateMill = dateInput!!.date
-        dbHandler!!.addItem(name, dateMill)
-        MainActivity.mAdapter.addToClickList()
-        MainActivity.mAdapter.addAnimationsToItem(getApplicationContext())
+        //dbHandler!!.addItem(name, dateMill) TODO
         super.onBackPressed()
     }
 }
